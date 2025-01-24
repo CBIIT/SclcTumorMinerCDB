@@ -1,0 +1,31 @@
+ {
+
+  "ccle":{
+    "displayName":"CCLE-Broad-MIT",
+    "packages":{
+      "ccleData":{
+        "MolData":[
+          {
+            "eSetListName":"xsq",
+            "featurePrefix":"xsq",
+            "displayName":"xsq: RNA-seq Expression (log2 RPKM+1.)"
+          },
+          {
+            "eSetListName":"mut",
+            "featurePrefix":"mut",
+            "displayName":"mut: DNA Mutation"
+          },
+
+          {
+            "eSetListName":"rrb",
+            "featurePrefix":"rrb",
+            "displayName":"rrb: DNA RRBS Methylation"
+          } 
+
+        ]
+      }
+    }
+  }
+
+  
+}

@@ -1,0 +1,81 @@
+{
+  
+  "patient":{
+    "displayName":" Patient data",
+    "fullName": "NCI CCR DTB",
+    "url": "https://ccr.cancer.gov/Developmental-Therapeutics-Branch",
+    "packages":{
+ //     "fpkmpatientData":{
+      "patientsNberData":{
+        "MetaData":[
+          {
+        		"dataType":"act",
+        		"description":"drug response based on first treatment post sampling",
+        		"units":"1: good response (PR or CR); 0: bad response (PD or SD)",
+        		"platform":"NA",
+        		"ref_pmid":"NA"
+        	},
+          {
+        		"dataType":"xsq",
+        		"description":"mRNA Expression",
+        		"units":"RNA-seq Expression in log2(FPKM+1)",
+        		"platform":"NA",
+        		"ref_pmid":"NA"
+        	},
+        	{
+        		"dataType":"mut",
+        		"description":"Somatic mutation data genes",
+        		"units":"probability of homozygous, function-impacting mutation",
+        		"platform":"exome capture sequencing",
+        		"ref_pmid":"NA"
+        	},
+        //		{
+        //		"dataType":"muc",
+        //		"description":"Somatic mutation data genes based on common regions",
+        //		"units":"probability of homozygous, function-impacting mutation",
+        //		"platform":"exome capture sequencing",
+        //		"ref_pmid":"NA"
+       // 	},
+        	 {
+        		"dataType":"var",
+        		"description":"Somatic mutation data variants",
+        		"units":"variant allele frequency",
+        		"platform":"exome capture sequencing",
+        		"ref_pmid":"NA"
+        	},
+      //  	 {
+       // 		"dataType":"met",
+      // 		"description":"DNA methylation",
+      //  		"units":"average of beta values for gene-associated probes; 0 (no methylation), 1 (complete methylation)",
+     //   		"platform":"Illumina Infinium Human Methylation",
+      //  		"ref_pmid":""
+       // 	},
+      //  	{
+      //  		"dataType":"cop",
+      //  		"description":"DNA copy number",
+     //  		"units":"gene-level copy number estimate based on methylation",
+      //  		"platform":"Illumina Infinium Human Methylation",
+      //  		"ref_pmid":""
+       // 	},
+         	 {
+        		"dataType":"mda",
+         		"description":"Patient Metadata",
+        		"units":"measure-specific",
+        		"platform":"NA",
+        		"ref_pmid":"NA"
+        	},
+        	{
+        		"dataType":"hll",
+        		"description":"Hallmark genesets",
+        		"units":"Scaled ssGSEA score",
+        		"platform":"NA",
+        		"ref_pmid":"NA"
+         	}
+        	
+       	]
+      }
+    }
+  }
+ 
+  
+}

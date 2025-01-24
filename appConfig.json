@@ -1,0 +1,23 @@
+{
+  "appName":"SCLC TumorMiner",
+  "appVersion":"1.0",  
+  "appRelease":"January 2025",
+  "runParCorsInParallel":true,
+  "runParCorsInParallelThreshold":2000,
+   "TopLinks":[
+          {
+            "label":" CellMiner NCI-60 ",
+            "url":"https://discover.nci.nih.gov/cellminer/"
+          },
+          {
+            "label":" NCI/DCTD/DTP ",
+            "url":"https://dtp.cancer.gov"
+          }
+          ],
+   "category": "test",
+ //  "banner": "files/banner1d1.jpg",
+    "banner": "files/TMbanner.jpg"
+ //  "modal" : "www/files/CellMinerCDB-ver4.mp4"
+}
+
+   

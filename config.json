@@ -1,0 +1,65 @@
+ {
+
+  "patient":{
+    "displayName":"Patient data",
+    "packages":{
+     // "fpkmpatientData":{
+      "patientsNberData":{
+        "MolData":[
+          {
+            "eSetListName":"xsq",
+            "featurePrefix":"xsq",
+            "displayName":"xsq: RNA-seq data in log2(FPKM+1)"
+          },
+         {
+            "eSetListName":"mut",
+            "featurePrefix":"mut",
+            "displayName":"mut: DNA somatic mutation genes"
+          },
+          //{
+          //  "eSetListName":"muc",
+          //  "featurePrefix":"muc",
+          //  "displayName":"muc: DNA somatic mutation genes based on common regions"
+        //  },
+          {
+            "eSetListName":"var",
+            "featurePrefix":"var",
+            "displayName":"var: DNA somatic mutation variants"
+          },
+       //    {
+       //     "eSetListName":"met",
+       //     "featurePrefix":"met",
+       //     "displayName":"met: DNA methylation"
+       //   },
+       //    {
+       //     "eSetListName":"cop",
+       //     "featurePrefix":"cop",
+       //     "displayName":"cop: DNA copy number"
+       //   },
+          {
+            "eSetListName":"mda",
+            "featurePrefix":"mda",
+            "displayName":"mda: Signatures, Miscellaneous data"
+          },
+             {
+             "eSetListName":"hll",
+             "featurePrefix":"hll",
+             "displayName":"hll: Hallmark gene sets"
+          }
+        ],
+          "DrugData":[
+          {
+            "featurePrefix":"act",
+            "displayName":"act: Drug Response",
+            "drugAnnotIdCol":"ID",
+            "drugAnnotNameCol":"NAME",
+            "drugAnnotMoaCol":"MOA",
+            "drugAnnotClinCol":"CLINICAL.STATUS"
+          }
+        ]
+      }
+    }
+  }
+
+ 
+}
