@@ -809,7 +809,7 @@ output$dynamicPatientHeading <- renderText({
   selected_data <- selected_patient_sample_data()
   selected_row <- input$patient_sample_data_rows_selected
   selected_sample_value <- selected_data[selected_row, "Sample_Name"]
-  paste0("Table Similarity for Sample ", selected_sample_value, ", Ranked By Sum of Scores (profile, expression, mutation or methylation)")
+  paste0("Table Similarity for Sample ", selected_sample_value, ", Ranked By Mean of Genomic Scores (expression, mutation or methylation)")
   }
 })
 
@@ -911,10 +911,9 @@ jaccard_profile <- function(A, B) {
   if (length(index) > 0) {
     compos = length(which(A[index] == B[index]))
     # intersection = length(intersect(A[index], B[index]))
+    #  
     # return (intersection/length(A))
-
-        ## return (compos/length(A)) old
-    return (compos/length(which( !is.na(A) ))) # new
+    return (compos/length(A))
   }
   else
     return (0)
@@ -935,9 +934,6 @@ sample_data <- data.frame(srcContent$patient$sampleData, check.names = FALSE) %>
   )) %>%
   as.data.frame() %>%
   select(-age)
-
-sample_data$sampleType[which(sample_data$sampleType=="SampleType:not reported")]= NA
-
 
 sample_data_v2 <- sample_data
 
@@ -975,12 +971,7 @@ patient_to_patient <- reactive ({
     shinyjs::toggle("patient_filter_label", condition = FALSE)
     shinyjs::toggle("selected_sample_info", condition = FALSE)
     
-    # wexp = 0.8
-    # wmut = 0.1
-    # wmeth = 0
-    # wprofile = 0.1
-    # 
-    # shiny::validate(need(wexp+wmut+wmeth+wprofile==1,"Total weight should be equal 1")) ## FE new
+    
     
     start_time <- Sys.time() 
     selected_sample_value <- selected_sample()
@@ -1014,8 +1005,7 @@ patient_to_patient <- reactive ({
         mutation_a_filtered <- non_zero_mutation[rownames(non_zero_mutation) %in% biomarkers[[patientDisease]][["mutation"]], ]
         #print(nrow(mutation_a_filtered))
         #print(head(mutation_a_filtered))
-       ## old  if(nrow(mutation_a_filtered) < 3 && nrow(non_zero_mutation) != 0) {
-          if(nrow(mutation_a_filtered) < 1) {
+        if(nrow(mutation_a_filtered) < 3 && nrow(non_zero_mutation) != 0) {
           shinyalert::shinyalert(
           title = paste("Not enough biomarkers present"), 
           text = paste("We have", nrow(mutation_a_filtered), " mutation biomarkers present in this sample, thus the mutation column will not be included"), 
@@ -1134,28 +1124,15 @@ patient_to_patient <- reactive ({
     
     # sample_vector_mutation <- mutation_a_filtered %>%
     #   select({{ selected_sample_value }})
-    cat(nrow(mutation_a_filtered) ,"\t", nrow(sample_vector_mutation),"****mutation****\n" )
-    write.csv(mutation_a_filtered,"mut_a_filtered.csv")
     
-    ## new mutation calculation 
-    if (nrow(mutation_a_filtered) < 1) {
+    cat(nrow(mutation_a_filtered) ,"\t", nrow(sample_vector_mutation),"****mutation****\n" )
+    if (nrow(mutation_a_filtered) < 3) {
       mutation_cor <- NA
     }
     else{
-      mutation_cor <- apply(mutation_a_filtered, 2 ,function(x) {length(which(x>0)) / nrow(sample_vector_mutation) } )
-      # mutation_cor[which(mutation_cor==0)] = NA
+      mutation_cor <- cor(mutation_a_filtered, sample_vector_mutation, use = "pairwise.complete.obs")
       rownames(mutation_cor) <- NULL
     }
-   
-     ## old computation
-    # if (nrow(mutation_a_filtered) < 3) {
-    #   mutation_cor <- NA
-    # }
-    # else{
-    #   mutation_cor <- cor(mutation_a_filtered, sample_vector_mutation, use = "pairwise.complete.obs")
-    #   rownames(mutation_cor) <- NULL
-    # }
-    ## end old
     
     # Check if there are still enough rows to calculate the correlation
     # cat(nrow(mutation_a_filtered) ,"\t", nrow(sample_vector_mutation),"****\n" )
@@ -1275,18 +1252,9 @@ patient_to_patient <- reactive ({
     
     data$Mean_Of_Genomic_Features  <- rowMeans(data[, c("Expression_Score", "Mutation_Score", "Methylation_Score")], na.rm = TRUE)
     
-    data$SumScore  <- rowSums(data[, c("Expression_Score", "Mutation_Score", "Methylation_Score","Common_Feature_Score")], na.rm = TRUE)
-    
-    # old
-    # data <- data %>%
-    #   select("Sample_Name", "Jaccard_Similarity", "Common_Feature_Score", "Expression_Score", "Mutation_Score", "Methylation_Score" ,"Mean_Of_Genomic_Features") %>%
-    #   arrange(desc(Mean_Of_Genomic_Features))
-    
-    # new
     data <- data %>%
-      select("Sample_Name", "Common_Feature_Score", "Expression_Score", "Mutation_Score", "Methylation_Score" ,"SumScore","Mean_Of_Genomic_Features") %>%
-      arrange(desc(SumScore))
-    
+      select("Sample_Name", "Jaccard_Similarity", "Common_Feature_Score", "Expression_Score", "Mutation_Score", "Methylation_Score" ,"Mean_Of_Genomic_Features") %>%
+      arrange(desc(Mean_Of_Genomic_Features))
     
     ## data <- left_join(data, sample_data[, c("Name", "OncoTree1", "OncoTree2")], by = c("Sample_Name" = "Name")) ## FE new
 
@@ -1303,11 +1271,7 @@ patient_to_patient <- reactive ({
     #   rename(Trt_Response = Drug_Response,
     #          Trt_Name = Treatment_Name)
     
-    ## old
-    # todisplay = c("Sample_Name", "OncoTree1", "OncoTree2","Mean_Of_Genomic_Features","Jaccard_Similarity","Treatment","Response_to_treatment")
-    ## new
-    todisplay = c("Sample_Name", "OncoTree1", "OncoTree2","SumScore","Treatment","Response_to_treatment")
-    
+    todisplay = c("Sample_Name", "OncoTree1", "OncoTree2","Mean_Of_Genomic_Features","Jaccard_Similarity","Treatment","Response_to_treatment")
     data <- data[, c(todisplay, setdiff(names(data), todisplay))]
       
     
@@ -1318,7 +1282,7 @@ patient_to_patient <- reactive ({
     { 
       xsqgenes = intersect(rownames(expression_ccle), rownames(sample_vector))
       mutgenes = intersect(rownames(mutation_ccle), rownames(sample_vector_mutation))
-      cat("xsq genes: ", length(xsqgenes), " mut genes: ", length(mutgenes), "\n")
+     
        if (!is.null(hmethyl)) 
         metgenes = intersect(rownames(methylation_ccle), rownames(sample_vector_methylation))
        else  metgenes = c()
@@ -1330,25 +1294,14 @@ patient_to_patient <- reactive ({
         expression_cor <- cor(expression_ccle[xsqgenes,], sample_vector[xsqgenes,], use = "pairwise.complete.obs")
         rownames(expression_cor) <- NULL
       }
-      ## old computation
-      # if (length(mutgenes) < 3) {
-      #   mutation_cor <- NA
-      # }
-      # else{
-      #   mutation_cor <- cor(mutation_ccle[mutgenes,], sample_vector_mutation[mutgenes,], use = "pairwise.complete.obs")
-      #   rownames(mutation_cor) <- NULL
-      # }
-      ## end old
-      ## new mutation computation
-      if (length(mutgenes) < 1) {
+      ## 
+      if (length(mutgenes) < 3) {
         mutation_cor <- NA
       }
       else{
-        ## mutation_cor <- cor(mutation_ccle[mutgenes,], sample_vector_mutation[mutgenes,], use = "pairwise.complete.obs")
-        mutation_cor <- apply(mutation_ccle[mutgenes,], 2 ,function(x) {length(which(x>0)) / length(mutgenes) } )
+        mutation_cor <- cor(mutation_ccle[mutgenes,], sample_vector_mutation[mutgenes,], use = "pairwise.complete.obs")
         rownames(mutation_cor) <- NULL
       }
-      
       ##
       if (length(metgenes) < 3) {
         methylation_cor <- NA
@@ -1396,29 +1349,14 @@ patient_to_patient <- reactive ({
       
       data$Mean_Of_Genomic_Features  <- rowMeans(data[, c("Expression_Score", "Mutation_Score", "Methylation_Score")], na.rm = TRUE)
       
-      # data <- data %>%
-      #   select("Sample_Name", "Jaccard_Similarity", "Common_Feature_Score", "Expression_Score", "Mutation_Score", "Methylation_Score" ,"Mean_Of_Genomic_Features") %>%
-      #   arrange(desc(Mean_Of_Genomic_Features))
-      # 
-      ## new
-      
-      data$SumScore  <- rowSums(data[, c("Expression_Score", "Mutation_Score", "Methylation_Score","Common_Feature_Score")], na.rm = TRUE)
-   
       data <- data %>%
-        select("Sample_Name", "Common_Feature_Score", "Expression_Score", "Mutation_Score", "Methylation_Score" ,"SumScore","Mean_Of_Genomic_Features") %>%
-        arrange(desc(SumScore))
-      
-      ## end new
-      
+        select("Sample_Name", "Jaccard_Similarity", "Common_Feature_Score", "Expression_Score", "Mutation_Score", "Methylation_Score" ,"Mean_Of_Genomic_Features") %>%
+        arrange(desc(Mean_Of_Genomic_Features))
       
       ## data <- left_join(data, cell_data[, c("Name", "OncoTree1", "OncoTree2")], by = c("Sample_Name" = "Name")) ## FE new
       data <- left_join(data, ccleinfo[, c("Name", "OncoTree1", "OncoTree2","Top_Sensitive_Drugs","Bottom_Resistant_Drugs","nb_drugs")], by = c("Sample_Name" = "Name")) 
       ## data <- left_join(data, PatientSampleData[, c("Sample_Name", "OncoTree1", "OncoTree2","Treatment_Name","Drug_Response")], by = c("Sample_Name" = "Sample_Name"))
-      ## old
-      ## todisplay = c("Sample_Name", "OncoTree1", "OncoTree2", "Mean_Of_Genomic_Features","Jaccard_Similarity","Top_Sensitive_Drugs")
-      
-      todisplay = c("Sample_Name", "OncoTree1", "OncoTree2", "SumScore","Top_Sensitive_Drugs")
-      
+      todisplay = c("Sample_Name", "OncoTree1", "OncoTree2", "Mean_Of_Genomic_Features","Jaccard_Similarity","Top_Sensitive_Drugs")
       ## data <- data[, c("Sample_Name", "OncoTree1", "OncoTree2", setdiff(names(data), c("Sample_Name", "OncoTree1", "OncoTree2")))] 
       data <- data[, c(todisplay, setdiff(names(data), todisplay))] 
       
@@ -1449,7 +1387,7 @@ patient_to_patient <- reactive ({
     shinyjs::toggle("selected_sample_info", condition = TRUE)
     
     
-    write.csv(data,"test_balloon.csv")
+    
     return(data)
     }
   })
@@ -1458,8 +1396,7 @@ patient_to_patient <- reactive ({
 output$balloonPlot <- renderPlot({
   res <- patient_to_patient()
   available_columns <- colnames(res)
-  ## columns_to_select <- c("Sample_Name", "Jaccard_Similarity", "Common_Feature_Score")
-  columns_to_select <- c("Sample_Name", "Common_Feature_Score")
+  columns_to_select <- c("Sample_Name", "Jaccard_Similarity", "Common_Feature_Score")
   
   if (exists("Expression_Score", where = res)) {
     columns_to_select <- c(columns_to_select, "Expression_Score")
@@ -1474,7 +1411,6 @@ output$balloonPlot <- renderPlot({
   }
   
   columns_to_select <- c(columns_to_select, "Mean_Of_Genomic_Features")
-  columns_to_select <- c(columns_to_select, "SumScore")
   
   res2 <- res %>% select(all_of(columns_to_select))
   colnames(res2)[1] <- "Cell_Line_Name"
@@ -1484,10 +1420,7 @@ output$balloonPlot <- renderPlot({
   
   melt_res2 <- melt(res2, id.vars = "Cell_Line_Name")  
   #print(sum(available_columns %in% c("Expression_Score", "Mutation_Score", "Methylation_Score")))
-  #old
-  # melt_res2 <- transform(melt_res2, Cell_Line_Name = reorder(melt_res2$Cell_Line_Name, melt_res2$value, FUN = function(x) {mean(x[3:(2+sum(available_columns %in% c("Expression_Score", "Mutation_Score", "Methylation_Score")))], na.rm = TRUE)}))
-  # new
-  melt_res2 <- transform(melt_res2, Cell_Line_Name = reorder(melt_res2$Cell_Line_Name, melt_res2$value, FUN = function(x) {sum(x[1:(0+sum(available_columns %in% c("Expression_Score", "Mutation_Score", "Methylation_Score","Common_Feature_Score")))], na.rm = TRUE)}))
+  melt_res2 <- transform(melt_res2, Cell_Line_Name = reorder(melt_res2$Cell_Line_Name, melt_res2$value, FUN = function(x) {mean(x[3:(2+sum(available_columns %in% c("Expression_Score", "Mutation_Score", "Methylation_Score")))], na.rm = TRUE)}))
   
   p <- plot_balloon_plot(melt_res2, "Tumor To Tumor Similarity")
   p <- p + ylab("Top 20 Tumor Samples") + xlab("Unweighted Similarity Scores By Data Type") + theme(axis.text.y = element_text(size = 17), axis.title.y = element_text(size = 17), axis.text.x = element_text(size = 10), axis.title.x = element_text(size = 17), axis.text = element_text(face="bold"), axis.title = element_text(face="bold"), title = element_text(face="bold")) 

@@ -4,10 +4,10 @@ plotWidth <- 1300
 
 OutOfSurvival <- c("CSCLC_NCI","LNET_MyPart","NSCLC_NCI","SCCE_NCI","TNET_NCI","TNET_MyPart","TNET_NIDDK")
 
-## srcContent_cell <- readRDS("srcContent_cell.rds")
+ srcContent_cell <- readRDS("srcContent_cell.rds")
 # ccleinfo <- read.csv("ccle_cells_depmap_infosimilar.csv", row.names = 1, stringsAsFactors = F)
 
-## ccleinfo <- read.csv("ccle_cells_depmap_infosimilar_drugs.csv", row.names = 1, stringsAsFactors = F)
+ ccleinfo <- read.csv("ccle_cells_depmap_infosimilar_drugs.csv", row.names = 1, stringsAsFactors = F)
 
 ## ADC target genes
 ## adcgenes = read.delim("Genes44_targetADC_v2.txt",row.names = 1)

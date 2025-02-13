@@ -5,8 +5,8 @@
     "fullName": "NCI CCR DTB",
     "url": "https://ccr.cancer.gov/Developmental-Therapeutics-Branch",
     "packages":{
- //     "fpkmpatientData":{
-      "patientsNberData":{
+      "patientsData":{
+     // "patientsNberData":{
         "MetaData":[
           {
         		"dataType":"act",

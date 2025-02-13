@@ -70,11 +70,13 @@ getFeatureData <- function(prefix, id, dataSource, srcContent, originalId) {
 	# e.g., expTOP1 with dataSource=nci60 becomes TOP1 (exp, nci60)
 	labs=metaConfig[[dataSource]][["displayName"]]
 	if (toupper(id)==toupper(originalId))  {
-	results$plotLabel <- paste0(id, " (", prefix, ", ", labs, ")")
+	   ## results$plotLabel <- paste0(id, " (", prefix, ", ", labs, ")")
+	   results$plotLabel <- paste0(id, " (", prefix, ")")
 	}
 	else {
-	  if (prefix!="act") results$plotLabel <- paste0(toupper(originalId),": ",id, " (", prefix, ", ", labs, ")") else results$plotLabel <- paste0(id, " (", prefix, ", ", labs, ")")
-	    
+	  ## if (prefix!="act") results$plotLabel <- paste0(toupper(originalId),": ",id, " (", prefix, ", ", labs, ")") else results$plotLabel <- paste0(id, " (", prefix, ", ", labs, ")")
+	  if (prefix!="act") results$plotLabel <- paste0(toupper(originalId),": ",id, " (", prefix, ")") else results$plotLabel <- paste0(id, " (", prefix, ")")
+	  
 	}
 	  
 	
@@ -104,7 +106,8 @@ getSampleSetTissueTypes <- function(sampleSet, dataSource, srcContent) {
 	
 	matchedTypes <- character(0)
 	if (any(isMatchedType)) {
-		matchedTypes <- sort(unique(names(tissueToSamples[isMatchedType])))
+		## matchedTypes <- sort(unique(names(tissueToSamples[isMatchedType])))
+		matchedTypes <-  unique(names(tissueToSamples[isMatchedType])) 
 	}
 	
 	return(matchedTypes)

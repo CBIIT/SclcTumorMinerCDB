@@ -1,6 +1,7 @@
 library(rcellminer)
 ## library(allpatientData)
 ## library(fpkmpatientData)
+# library(almanacData)
 library(patientsData)
 library(patientsNberData)
 library(patientsBcorData)

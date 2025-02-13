@@ -14,7 +14,8 @@ regressionModelsInput <- function(id, dataSourceChoices) {
 	    voptions =  paste0(voptions,"<option value=",dataSourceChoices[y],">",names(dataSourceChoices)[y],"</option>;");
 	  }
 	}
-	tabPanel("Multivariate Analyses",
+	## tabPanel("Multivariate Analyses",
+	tabPanel("Multivariable Analyses",
 					 fluidPage(
 					 	sidebarLayout(
 					 		sidebarPanel(
@@ -28,15 +29,15 @@ regressionModelsInput <- function(id, dataSourceChoices) {
 					 				),
 					 				br(),br(),
 					 				uiOutput(ns("responseDataTypeUi")),
-					 				textInput(ns("responseId"), "Response Identifier:", "Durvalumab/Olaparib"),
-					 				### textInput(ns("responseId"), "Response Identifier:", "SLFN11"),
+					 				## textInput(ns("responseId"), "Response Identifier:", "Durvalumab/Olaparib"),
+					 				textInput(ns("responseId"), "Response Identifier:", "ASCL1"),
 					 				br(),
 					 				uiOutput(ns("predDataTypesUi")),
 					 				sliderInput(ns("minPredValueRange"), 
 					 										"Minimum Predictor Range (for first listed data type):", 
 					 										min=0, max=5, value=0, step = 0.25),
 					 				### textInput(ns("predIds"), "Predictor Identifiers: (Case-Sensitive, e.g. SLFN11 BPTF)", "SLFN11 BPTF"),
-					 				textInput(ns("predIds"), "Predictor Identifiers: (Case-Sensitive, e.g. MAGEH1 NFKBIA)", "MAGEH1 NFKBIA"),
+					 				textInput(ns("predIds"), "Predictor Identifiers: (Case-Sensitive, e.g. INSM1 DLL3)", "INSM1 DLL3 CHGA NEUROD1 POU2F3 NOTCH1"),
 					 				br(),
 					 				radioButtons(ns("tissueSelectionMode"), "Select Tissues", c("To include", "To exclude")),
 					 				uiOutput(ns("selectTissuesUi")),
@@ -48,9 +49,13 @@ regressionModelsInput <- function(id, dataSourceChoices) {
 			#    		 				  paste("<br><label class='control-label' for=",ns("algorithm"),">Algorithm</label>","<select id=",ns("algorithm"),"><option selected>Linear Regression</option><option>Lasso</option></select>")
 			# 		 				),
 					 				HTML(
-					 				  paste("<br><label class='control-label' for=",ns("algorithm"),">Algorithm</label>","<select id=",ns("algorithm"),"><option>Linear Regression</option><option>Lasso</option><option>Display</option></select>")
+					 				  # paste("<br><label class='control-label' for=",ns("algorithm"),">Algorithm</label>","<select id=",ns("algorithm"),"><option>Linear Regression</option><option>Lasso</option><option>Display</option></select>")
+					 				    paste("<br><label class='control-label' for=",ns("algorithm"),">Algorithm</label>","<select id=",ns("algorithm")," size='3' ><option selected>Display</option><option>Lasso</option><option>Linear Regression</option></select>")
 					 				),
-					 				
+					 				## new radio : no for now
+		              #	radioButtons("optsurv","Data type", choices = c("Gene expression" = "xsq", "Gene mutation" = "mut","Metadata/signatures" = "mda" )),
+			
+			
 					 				# Only show these panels if selected algorithm is Lasso.
 					 				conditionalPanel(
 					 					# condition must be a Javascript expression.
@@ -582,7 +587,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 	# Returns a data frame with partial correlation-based pattern comparison results.
 	parCorPatternCompResults <- eventReactive(input$computeParCors, {
 ## 10/26
-	  shiny::validate(need(input$algorithm != "Display", "Warning: you are in mode display."))
+	  shiny::validate(need(input$algorithm != "Display", "Not available in mode display. Please select Linear regression or Lasso."))
 	  
 	  shiny::validate(need(length(input$pcGeneSets) > 0,
 												 "Please select one or more gene sets."))
@@ -821,7 +826,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 	output$plot <- renderPlotly({
 		rmAlgoResults <- algoResults()
 		## 10/16
-		shiny::validate(need(rmAlgoResults$algorithm != "Display", "Warning: you are in mode display."))
+		shiny::validate(need(rmAlgoResults$algorithm != "Display", "Not available in mode display. Please select Linear regression or Lasso."))
 		
 		responseData <- rmResponseData()
 		if (!is.null(rmAlgoResults$updatedInputData)){
@@ -841,14 +846,16 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 		srd=unlist(strsplit(responseData$name,"_"))[2]
 		pprefix=substr(responseData$name,1,3)
 		labs=metaConfig[[srd]][["displayName"]]
-		responseData$plotLabel <- paste0("Observed ",idd, " (", pprefix, ", ", labs, ")")
+		## responseData$plotLabel <- paste0("Observed ",idd, " (", pprefix, ", ", labs, ")")
+		responseData$plotLabel <- paste0("Observed ",idd, " (", pprefix, ")")
 		## ---------------------------------------------
 		
 		predResponseData <- list()
 		predResponseData$name <- paste0("predicted_", responseData$name)
 		predResponseData$data <- rmAlgoResults$predictedResponse
 		# predResponseData$plotLabel <- predResponseData$name
-		predResponseData$plotLabel <- paste0("Predicted ",idd, " (", pprefix, ", ", labs, ")")
+		## predResponseData$plotLabel <- paste0("Predicted ",idd, " (", pprefix, ", ", labs, ")")
+		predResponseData$plotLabel <- paste0("Predicted ",idd, " (", pprefix, ")")
 		predResponseData$uniqName  <- predResponseData$name
 		predResponseData$dataSource <- responseData$dataSource
 		
@@ -872,7 +879,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 	output$cvPlot <- renderPlotly({
 		rmAlgoResults <- algoResults()
 		## 10/26
-		shiny::validate(need(rmAlgoResults$algorithm != "Display", "Warning: you are in mode display."))
+		shiny::validate(need(rmAlgoResults$algorithm != "Display", "Not available in mode display. Please select Linear regression or Lasso."))
 		
 		responseData <- rmResponseData()
 		if (!is.null(rmAlgoResults$updatedInputData)){
@@ -892,14 +899,16 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 		srd=unlist(strsplit(responseData$name,"_"))[2]
 		pprefix=substr(responseData$name,1,3)
 		labs=metaConfig[[srd]][["displayName"]]
-		responseData$plotLabel <- paste0("Observed ",idd, " (", pprefix, ", ", labs, ")")
+		## responseData$plotLabel <- paste0("Observed ",idd, " (", pprefix, ", ", labs, ")")
+		responseData$plotLabel <- paste0("Observed ",idd, " (", pprefix, ")")
 		## ---------------------------------------------
 		
 		cvPredResponseData <- list()
 		cvPredResponseData$name <- paste0("cv_predicted_", responseData$name)
 		cvPredResponseData$data <- rmAlgoResults$cvPredictedResponse
 		#cvPredResponseData$plotLabel <- cvPredResponseData$name
-		cvPredResponseData$plotLabel <- paste0("10-Fold Cross-Validation ",idd, " (", pprefix, ", ", labs, ")")
+		## cvPredResponseData$plotLabel <- paste0("10-Fold Cross-Validation ",idd, " (", pprefix, ", ", labs, ")")
+		cvPredResponseData$plotLabel <- paste0("10-Fold Cross-Validation ",idd, " (", pprefix, ")")
 		cvPredResponseData$uniqName  <- cvPredResponseData$name
 		cvPredResponseData$dataSource <- responseData$dataSource
 		
@@ -1052,7 +1061,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 	output$techDetails <- renderPrint({
 		rmAlgoResults <- algoResults()
 		## 10/26
-		shiny::validate(need(rmAlgoResults$algorithm != "Display", "Warning: you are in mode display."))
+		shiny::validate(need(rmAlgoResults$algorithm != "Display", "Not available in mode display. Please select Linear regression or Lasso."))
 		
 		if ("eqnStr" %in% names(rmAlgoResults)){
 			cat("PREDICTED RESPONSE AS A FUNCTION OF INPUT VARIABLES:")
@@ -1099,7 +1108,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 	output$patternCompResults <- DT::renderDataTable({
 	  ## 10/26
 	  rmAlgoResults <- algoResults()
-	  shiny::validate(need(input$algorithm != "Display", "Warning: you are in mode display."))
+	  shiny::validate(need(input$algorithm != "Display", "Not available in mode display. Please select Linear regression or Lasso."))
 
 	  pcResults <- parCorPatternCompResults()
 		#pcResults$ANNOT <- ""
@@ -1163,7 +1172,8 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 	
 	#----[Organize Above Tabs for Display]--------------------------------------------------
 	output$tabsetPanel = renderUI({
-		maxNumHiLoResponseLines <- 100
+		## maxNumHiLoResponseLines <- 100
+		maxNumHiLoResponseLines <- 120
 		ns <- session$ns
 		##
 		choices = c(names(geneSetPathwayAnalysis::geneSets), "All Genes")
@@ -1218,7 +1228,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 																sliderInput(ns("numHiLoResponseLines"), 
 																						"Number of High/Low Response Lines to Display:", 
 																						min=1, max=maxNumHiLoResponseLines, 
-																						value=30, width = "50%"),
+																						value=maxNumHiLoResponseLines, width = "50%"),
 																checkboxInput(ns("useHeatmapRowColorScale"), "Use Row Color Scale", FALSE),
 ## 																## d3heatmapOutput(ns("heatmap")),
                                 plotlyOutput(ns("heatmap")),
@@ -1318,7 +1328,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 		## 
 		# mych= srcContent[[input$dataset]][["defaultFeatureY"]]
 		## change default Y
-		mych= "act"
+		mych= "xsq"
 		#
 		for(y in 1:length(choices)){
 		  if (choices[y]==mych)

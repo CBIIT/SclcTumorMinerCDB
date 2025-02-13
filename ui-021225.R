@@ -468,8 +468,6 @@ tabPanel("Prognosis Biomarkers",
 		# 				 ) #end fluidPage
 		# ), #end tabPane 
 
-### new predictive biomarkers , coming soon--------------------------------------------------------------------
-
 ## new Mypatient Module -----------------
 
 myPatientModuleUI("myPatient"),

@@ -2,27 +2,37 @@ getTissue2SamplesMap <- function(sampleData, typeLevelSeparator = ":"){
 	stopifnot(all(!duplicated(sampleData$Name)))
 	rownames(sampleData) <- sampleData$Name
 	tissueToSamples <- list()
-	ocLevels <- paste0("OncoTree", 1:4)
+	# ocLevels <- paste0("OncoTree", 1:4)
 	
-	for (sample in rownames(sampleData)){
-		sampleOcTypes <- as.character(sampleData[sample, ocLevels])
-		## typeName <- sampleOcTypes[1]
-		typeName <- paste0("AllCancerType", typeLevelSeparator,sampleOcTypes[1]) ## new !! 3/4/2024
-		if (is.na(typeName)){
-			next
-		}
-		
-		tissueToSamples[[typeName]] <- c(tissueToSamples[[typeName]], sample)
-		for (i in (2:4)){
-			if (is.na(sampleOcTypes[i])){
-				break
-			}
-			typeName <- paste0(typeName, typeLevelSeparator, sampleOcTypes[i])
-			tissueToSamples[[typeName]] <- c(tissueToSamples[[typeName]], sample)
-		}
-	}
+	# for (sample in rownames(sampleData)){
+	# 	sampleOcTypes <- as.character(sampleData[sample, ocLevels])
+	# 	## typeName <- sampleOcTypes[1]
+	# 	typeName <- paste0("AllCancerType", typeLevelSeparator,sampleOcTypes[1]) ## new !! 3/4/2024
+	# 	if (is.na(typeName)){
+	# 		next
+	# 	}
+	# 	
+	# 	tissueToSamples[[typeName]] <- c(tissueToSamples[[typeName]], sample)
+	# 	for (i in (2:4)){
+	# 		if (is.na(sampleOcTypes[i])){
+	# 			break
+	# 		}
+	# 		typeName <- paste0(typeName, typeLevelSeparator, sampleOcTypes[i])
+	# 		tissueToSamples[[typeName]] <- c(tissueToSamples[[typeName]], sample)
+	# 	}
+	# }
 	
 	# Additional phenotype-based sample sets -------------------------------------
+	
+	if ("dataSet" %in% colnames(sampleData)) {
+	  emtSampleData <- sampleData[!is.na(sampleData$dataSet), , drop = FALSE]
+	  tmp <- split(emtSampleData$Name, emtSampleData$dataSet)
+	  stopifnot(length(intersect(names(tmp), names(tissueToSamples))) == 0)
+	  tissueToSamples[["DataSet"]] <- emtSampleData$Name     ## New
+	  tissueToSamples <- c(tissueToSamples, tmp)
+	}
+	
+	
 	if ("EMT" %in% colnames(sampleData)) {
 		emtSampleData <- sampleData[!is.na(sampleData$EMT), , drop = FALSE]
 		tmp <- split(emtSampleData$Name, emtSampleData$EMT)
@@ -67,21 +77,21 @@ getTissue2SamplesMap <- function(sampleData, typeLevelSeparator = ":"){
 	}
 	# ----------------------------------------------------------------------------
 	# Additional phenotype-based sample sets -------------------------------------
-	if ("molecularSubtype" %in% colnames(sampleData)) {
-	  emtSampleData <- sampleData[!is.na(sampleData$molecularSubtype), , drop = FALSE]
-	  tmp <- split(emtSampleData$Name, emtSampleData$molecularSubtype)
-	  stopifnot(length(intersect(names(tmp), names(tissueToSamples))) == 0)
-	  tissueToSamples[["MolecularSubtype"]] <- emtSampleData$Name     ## New
-	  tissueToSamples <- c(tissueToSamples, tmp)
-	}
+	# if ("molecularSubtype" %in% colnames(sampleData)) {
+	#   emtSampleData <- sampleData[!is.na(sampleData$molecularSubtype), , drop = FALSE]
+	#   tmp <- split(emtSampleData$Name, emtSampleData$molecularSubtype)
+	#   stopifnot(length(intersect(names(tmp), names(tissueToSamples))) == 0)
+	#   tissueToSamples[["MolecularSubtype"]] <- emtSampleData$Name     ## New
+	#   tissueToSamples <- c(tissueToSamples, tmp)
+	# }
 	
-	if ("dataSet" %in% colnames(sampleData)) {
-	  emtSampleData <- sampleData[!is.na(sampleData$dataSet), , drop = FALSE]
-	  tmp <- split(emtSampleData$Name, emtSampleData$dataSet)
-	  stopifnot(length(intersect(names(tmp), names(tissueToSamples))) == 0)
-	  tissueToSamples[["DataSet"]] <- emtSampleData$Name     ## New
-	  tissueToSamples <- c(tissueToSamples, tmp)
-	}
+	# if ("dataSet" %in% colnames(sampleData)) {
+	#   emtSampleData <- sampleData[!is.na(sampleData$dataSet), , drop = FALSE]
+	#   tmp <- split(emtSampleData$Name, emtSampleData$dataSet)
+	#   stopifnot(length(intersect(names(tmp), names(tissueToSamples))) == 0)
+	#   tissueToSamples[["DataSet"]] <- emtSampleData$Name     ## New
+	#   tissueToSamples <- c(tissueToSamples, tmp)
+	# }
 	
 	if ("gender" %in% colnames(sampleData)) {
 	  emtSampleData <- sampleData[!is.na(sampleData$gender), , drop = FALSE]
