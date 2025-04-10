@@ -43,16 +43,7 @@ myPatientModuleUI <- function(id) {
                 ## actionButton(ns("FindMyPatient"), "Find"),
                 width = 9,
                 h3("or select a patient by clicking on a row in the table below"),
-                
-                ## new hide table ....032425..............................
-                
-                checkboxInput(ns("showTable"), "Show Table", value=FALSE),
-                uiOutput(ns("patTableUi"))
-                ## actionButton(ns("MyPatientTable"), "Show patient table"),
-                
-                ## end new .................................................
-                
-                # DT::dataTableOutput(ns("myPatientSearchData"))
+                DT::dataTableOutput(ns("myPatientSearchData"))
               )
             ),
             tabPanel(
@@ -276,8 +267,7 @@ myPatientModuleUI <- function(id) {
             ###------------------------Immune Therapy Treatment 
             tabPanel(
              #  "Potential ADC treatment",
-             # "Immune Therapy Treatment",
-              "Predictive Biomarkers Details",
+              "Immune Therapy Treatment",
               fluidRow(
                 sidebarLayout(
                   sidebarPanel(
@@ -366,11 +356,6 @@ myModule <- function(input, output, session, srcContent) {
     selectizeInput(session$ns("patID"), "",choices = mychoices, multiple = F, selected = myselpat2())
     ## selectizeInput(session$ns("patID"), "",choices = mychoices, multiple = F , selected = "") ## new 
   })
-  
-  output$patTableUi <- renderUI({
-    if (input$showTable) DT::dataTableOutput(session$ns("myPatientSearchData"))
-  })
-  
   
   biomarkers <- fromJSON("biomarkers.json")
 
@@ -499,7 +484,7 @@ myModule <- function(input, output, session, srcContent) {
   
   #Merge Sample And Hormone Data
   PatientSampleData <- merge(PatientSampleData, selected_hormone_data_transpose,by.x=0, by.y=0) %>%
-  rename(TMB = mdaTMB)
+    rename(TMB = mdaTMB)
   # rename(TMB = mdaTMB,
   #        KI67perc = mdaKi67.,
   #        TMB.TSO500 = mdaTMB.TSO500,
@@ -508,107 +493,6 @@ myModule <- function(input, output, session, srcContent) {
   #        SyP.positive = mdaSyP.positive,
   #        Insm1 = mdaInsm1)
   
-  ## new April 2025 -------------------------------------------------------------
-  ## NMF ****
-    nmf_data <- srcContent$patient$molPharmData$nmf
-  th = 3.8
-  nmf_results <- apply(nmf_data,2, function(x) {
-    # cat(x," ", is.numeric(x))
-    res = ""
-    # cat(x[1])
-    if (x[1] >= th ) {
-      res = "NMF1u,"
-    } 
-    if (x[2] >= th) {
-      res = paste(res,"NMF2u,",sep="")
-    }
-    if (x[3] >= th) {
-      res = paste(res,"NMF3u,",sep="")
-    }
-    if (x[4] >= th) {
-      res = paste(res,"NMF4u,",sep="")
-    }
-    if (x[5] >= th) {
-      res = paste(res,"NMF1r,",sep="")
-    }
-    if (x[6] >= th) {
-      res = paste(res,"NMF2r,",sep="")
-    }
-    if (x[7] >= th) {
-      res = paste(res,"NMF3r,",sep="")
-    }
-    if (x[8] >= th) {
-      res = paste(res,"NMF4r",sep="")
-    }
-   
-    if(res=="") res = "NoCall"
-    return(res)
-  }
-  )
-  
-  nmf_results = gsub(",$","", nmf_results)
-  
- ## PatientSampleData$NMF_clusters <- nmf_results
- 
-  ## NAPY ***
-  
-  napy_data <- srcContent$patient$molPharmData$xsq[c("xsqNEUROD1","xsqASCL1","xsqPOU2F3","xsqYAP1"),]
-  thre =  5
-  napy_results <- apply(napy_data,2, function(x) {
-    # cat(x," ", is.numeric(x))
-    res = ""
-    # cat(x[1])
-    if (x[1] >= thre ) {
-      res = "NEUROD1,"
-    } 
-    if (x[2] >= thre) {
-      res = paste(res,"ASCL1,",sep="")
-    }
-    if (x[3] >= thre) {
-      res = paste(res,"POU2F3,",sep="")
-    }
-    if (x[4] >= thre) {
-      res = paste(res,"YAP1",sep="")
-    }
-    
-    if(res=="") res = "NoCall"
-    return(res)
-  }
-  )
-  
-napy_results = gsub(",$","", napy_results)
-## PatientSampleData$NAPY_classes <- napy_results
-
-### ADC -------------------------
-
-uniadc = paste0("xsq",unique(adcgenes$gene))
-adc_data <- srcContent$patient$molPharmData$xsq[uniadc,]
-rownames(adc_data) = substr(rownames(adc_data), 4, nchar(rownames(adc_data)))
-thre2 =  6
-adc_results <- apply(adc_data,2, function(x) {
-  res = ""
-   for (k in 1: length(x)) {
-     if (x[k] >= thre2) res = paste(res,names(x)[k],",",sep="")
-   }
-  
-  if(res=="") res = "NoCall"
-  return(res)
-}
-)
-
-adc_results = gsub(",$","", adc_results)
-
-groupsnew = data.frame(NMF_clusters  =  nmf_results, NAPY_classes = napy_results,
-                       Predictive_biomarkers = adc_results) 
-colnames(groupsnew) = c("NMF_clusters (exp>=3.8)", "NAPY_clusters (exp>=5)", "Predictive_biomarkers (exp>=6)")
-# PatientSampleData$Predictive_biomarkers <- adc_results
-PatientSampleData <- merge(PatientSampleData, groupsnew,by.x=1, by.y=0)
-
-PatientSampleData$MSI.TSO500 <- NULL
-PatientSampleData$molecularSubtype <- NULL
-
-## end New --------------------------------------------------------------------
-
   PatientSampleData$Row.names <- NULL
   
   
@@ -637,16 +521,10 @@ PatientSampleData$molecularSubtype <- NULL
   hideTab(inputId = "innerTabs1", target = "Methylation")
   hideTab(inputId = "innerTabs1", target = "Copy number")
   hideTab(inputId = "innerTabs1", target = "Specific genes")
-  hideTab(inputId = "innerTabs1", target = "Predictive Biomarkers Details")
+  hideTab(inputId = "innerTabs1", target = "Immune Therapy Treatment")
   hideTab(inputId = "innerTabs1", target = "Find Similar Patient or Cell line")
   
   ### new command button ----------------------------------
-  
-  observeEvent(input$MyPatientTable, {
-    
-    DT::dataTableOutput("myPatientSearchData")
- 
-  })
   
   # observeEvent(input$FindMyPatient, {
   #   
@@ -729,26 +607,17 @@ PatientSampleData$molecularSubtype <- NULL
       hideTab(inputId = "innerTabs1", target = "Methylation")
       hideTab(inputId = "innerTabs1", target = "Copy number")
       hideTab(inputId = "innerTabs1", target = "Specific genes")
-      hideTab(inputId = "innerTabs1", target = "Predictive Biomarkers Details")
+      hideTab(inputId = "innerTabs1", target = "Immune Therapy Treatment")
       hideTab(inputId = "innerTabs1", target = "Find Similar Patient or Cell line")
     }
   })
   
-  ####
- 
-  ####
-   ####  observeEvent(input$myPatientSearchData_rows_selected,ignoreNULL = FALSE, {
-    observeEvent(
-      {
-       input$myPatientSearchData_rows_selected
-       input$patID
-       } 
-         ,ignoreNULL = FALSE, {
+  
+  # observeEvent(selrow(),ignoreNULL = FALSE, {
+    observeEvent(input$myPatientSearchData_rows_selected,ignoreNULL = FALSE, {
         selected_row <- input$myPatientSearchData_rows_selected
-         cat("input list:", input$patID,is.null(input$patID), " input table:", selected_row,is.null(selected_row),"\n")
-        ## if (is.null(selected_row) ) {
-        if (is.null(selected_row) & is.null(input$patID)) { ## replace & by |
-         
+  #       selected_row <- selrow()
+        if (is.null(selected_row)) {
           cat("noselection \n")
           hideTab(inputId = "innerTabs1", target = "Clinical Data")
           hideTab(inputId = "innerTabs1", target = "Gene Expression")
@@ -756,56 +625,33 @@ PatientSampleData$molecularSubtype <- NULL
           hideTab(inputId = "innerTabs1", target = "Methylation")
           hideTab(inputId = "innerTabs1", target = "Copy number")
           hideTab(inputId = "innerTabs1", target = "Specific genes")
-          hideTab(inputId = "innerTabs1", target = "Predictive Biomarkers Details")
+          hideTab(inputId = "innerTabs1", target = "Immune Therapy Treatment")
           hideTab(inputId = "innerTabs1", target = "Find Similar Patient or Cell line")
         } else
           ## new
         { 
-          ### new2
-          if (trimws(input$patID)=="")
-          {
-            cat("noselection2 \n")
-            currentpatient <<- "" # new
-            hideTab(inputId = "innerTabs1", target = "Clinical Data")
-            hideTab(inputId = "innerTabs1", target = "Gene Expression")
-            hideTab(inputId = "innerTabs1", target = "Mutations")
-            hideTab(inputId = "innerTabs1", target = "Methylation")
-            hideTab(inputId = "innerTabs1", target = "Copy number")
-            hideTab(inputId = "innerTabs1", target = "Specific genes")
-            hideTab(inputId = "innerTabs1", target = "Predictive Biomarkers Details")
-            hideTab(inputId = "innerTabs1", target = "Find Similar Patient or Cell line")
-          }
-          ###
-          else
-          {
-            patientID <- input$patID
-          # if (!is.null(selected_row)) patientID <- PatientSearchData[selected_row, "patientID"]
-          #  else  patientID <- input$patID
-          
           cat(currentpatient," : current pat \n")
-          if( currentpatient != patientID)
+          if( currentpatient != selected_row)
           ##
           {
             
-            currentpatient <<- patientID
-            cat(currentpatient," : current pat new\n")
-            cat(selected_row," : selected row \n")
+            currentpatient <<- selected_row
+            cat(currentpatient," : current pat 2\n")
+          cat(selected_row," : selected row \n")
       shinyjs::disable("find_similar_patient")
-      ## patientID <- PatientSearchData[selected_row, "patientID"]
+      patientID <- PatientSearchData[selected_row, "patientID"]
       showTab(inputId = "innerTabs1", target = "Clinical Data", select = T)
       showTab(inputId = "innerTabs1", target = "Gene Expression")
       showTab(inputId = "innerTabs1", target = "Mutations")
-      ## showTab(inputId = "innerTabs1", target = "Methylation")
-      ## showTab(inputId = "innerTabs1", target = "Copy number")
+      showTab(inputId = "innerTabs1", target = "Methylation")
+      showTab(inputId = "innerTabs1", target = "Copy number")
       showTab(inputId = "innerTabs1", target = "Specific genes")
-      showTab(inputId = "innerTabs1", target = "Predictive Biomarkers Details")
+      showTab(inputId = "innerTabs1", target = "Immune Therapy Treatment")
       hideTab(inputId = "innerTabs1", target = "Find Similar Patient or Cell line")
       
       #Clincal Data <- Demographic & Sample Data
       selected_patient_demographic_data <- PatientSearchData[PatientSearchData$patientID == patientID, ]
       selected_patient_sample_data <- PatientSampleData[PatientSampleData$patientID == patientID, ]
-      # cat(dim(selected_patient_sample_data), "dim sample data\n")
-      # write.csv(selected_patient_sample_data,"test_sample_table.csv")
       selected_patient_sample_data(selected_patient_sample_data)
       
       
@@ -869,9 +715,9 @@ PatientSampleData$molecularSubtype <- NULL
             #   visible = TRUE
             # )
             list(
-              # targets = c(1, 2, 3,5, 6, 7, 8, 14, 16, 22, 23, 24, 25, 26),  # index first column is ZERO !!!
-              ## targets = c(1, 2, 3, 4, 5, 6, 7, 8, 14, 16),
-              targets = c(1, 2, 3, 4, 5, 6, 7, 8, 12:18),
+              ## targets = c(1, 2, 3,5, 6, 7, 8, 13, 15, 21, 22, 23, 24, 25),  # index first column is ZERO !!!
+              targets = c(1, 2, 3,5, 6, 7, 8, 14, 16, 22, 23, 24, 25, 26),  # index first column is ZERO !!!
+              # targets = c(1, 2), 
               visible = FALSE
             )
           )
@@ -902,8 +748,7 @@ PatientSampleData$molecularSubtype <- NULL
         selected = "Clinical Data"
       )
           }
-        ### end new2 
-          }
+        ### 
         ## end new
         }
         
@@ -918,7 +763,7 @@ PatientSampleData$molecularSubtype <- NULL
         #   hideTab(inputId = "innerTabs1", target = "Find Similar Patient or Cell line")
         # }
     
-  }) ## end double observe event
+  })
 
   #Display Find Similar Patient or Cell line Tab
   observeEvent(input$find_similar_patient, {
@@ -1692,28 +1537,15 @@ output$balloonPlot <- renderPlot({
   
   # Get selected patientID
   selected_row <- reactive(input$myPatientSearchData_rows_selected)
-  selected_pat <- reactive({
-    res = input$patID
-    if (is.null(res))
-        {
-          sel_row  = input$myPatientSearchData_rows_selected
-          if (!is.null(sel_row)) {
-             res = PatientSearchData[sel_row, "patientID"]
-          }
-         }
-     return(res)
-    }) ## new
   
   # Display patientID
   output$gene_expression_info <- renderUI({
-    # req(selected_row())  # Ensure that a row is selected
-    req(selected_pat())  # Ensure that a row is selected
+    req(selected_row())  # Ensure that a row is selected
     tags$div(
       style = "font-size: 16px; color: #333333;",
       tags$p(
         style = "font-size: 20px; color: blue;",
-      #  paste("Patient ID: ",  PatientSearchData[selected_row(), "patientID"])
-        paste("Patient ID: ",  PatientSearchData[which(PatientSearchData$patientID==selected_pat()), "patientID"])
+        paste("Patient ID: ",  PatientSearchData[selected_row(), "patientID"])
       )
     )
   })
@@ -1729,8 +1561,7 @@ output$balloonPlot <- renderPlot({
 
   
   output$gene_filter_label <- renderUI({
-    # patientDisease <- PatientSearchData[selected_row(), "disease"] 
-    patientDisease <- PatientSearchData[which(PatientSearchData$patientID == selected_pat() ), "disease"] 
+    patientDisease <- PatientSearchData[selected_row(), "disease"] 
     disease_label <- paste("Disease: ", patientDisease)
     tagList(
       tags$label(disease_label, style = "font-weight: bold;"),
@@ -1739,10 +1570,8 @@ output$balloonPlot <- renderPlot({
   })
   
   my_gene_expression <- reactive({
-    # if (!is.null(selected_row())) {  # Check if a row is selected
-    #   patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
-    if (!is.null(selected_pat())) {  # Check if a row is selected
-      patientID <- selected_pat()  # Get the patient ID of the selected row
+    if (!is.null(selected_row())) {  # Check if a row is selected
+      patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
       selected_samples <- PatientSampleData$Sample_Name[PatientSampleData$patientID == patientID]  # Get the selected patient's sample names
       gene_expression_cols <- c("ID", "Symbol", "chr", "start", "end", "strand", "EnsID", "biotype", selected_samples)  # Define the columns to select from gene expression data
       selected_gene_expression <- combined_gene_expression[, gene_expression_cols, drop = FALSE]  # Select the specified columns from the combined gene expression data
@@ -1757,8 +1586,7 @@ output$balloonPlot <- renderPlot({
       selected_gene_expression <- selected_gene_expression[, gene_expression_cols, drop = FALSE]
       
       
-      ## patientDisease <- PatientSearchData[selected_row(), "disease"] 
-      patientDisease <- PatientSearchData[which(PatientSearchData$patientID==selected_pat()), "disease"] 
+      patientDisease <- PatientSearchData[selected_row(), "disease"] 
       
       # Apply gene filter
       gene_filter <- input$gene_filter  # Get the selected gene filter option
@@ -1937,15 +1765,12 @@ output$balloonPlot <- renderPlot({
   # MUTATION DATA
   # Display patientID
   output$mutation_info <- renderUI({
-    # req(selected_row())  # Ensure that a row is selected
-    req(selected_pat())
+    req(selected_row())  # Ensure that a row is selected
     tags$div(
       style = "font-size: 16px; color: #333333;",
       tags$p(
         style = "font-size: 20px; color: blue;",
-        ## paste("Patient ID: ",  PatientSearchData[selected_row(), "patientID"])
-        paste("Patient ID: ",  PatientSearchData[which(PatientSearchData$patientID==selected_pat()), "patientID"])
-        
+        paste("Patient ID: ",  PatientSearchData[selected_row(), "patientID"])
       )
     )
   })
@@ -1959,8 +1784,7 @@ output$balloonPlot <- renderPlot({
   })
   
   output$mutation_filter_label <- renderUI({
-    ## patientDisease <- PatientSearchData[selected_row(), "disease"]
-    patientDisease <- PatientSearchData[which(PatientSearchData$patientID==selected_pat()), "disease"]
+    patientDisease <- PatientSearchData[selected_row(), "disease"]
     disease_label <- paste("Disease: ", patientDisease)
     tagList(
       tags$label(disease_label, style = "font-weight: bold;"),
@@ -1971,12 +1795,8 @@ output$balloonPlot <- renderPlot({
 #Mutation Data
   my_mutation <- reactive ({
     # Get the selected patient's sample column names
-    # if (!is.null(selected_row())) {  # Check if a row is selected
-    #   patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
-    if (!is.null(selected_pat())) {  # Check if a row is selected
-        patientID <- selected_pat()  # Get the patient ID of the selected row
-        
-      
+    if (!is.null(selected_row())) {  # Check if a row is selected
+      patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
       selected_samples <- PatientSampleData$Sample_Name[PatientSampleData$patientID == patientID]  # Get the selected patient's sample names
       mutation_cols <- c("Symbol", "Chromosome", "Start", "End", "Strand", selected_samples)  # Define the columns to select from gene expression data
       selected_mutation <- combined_mutation[, mutation_cols, drop = FALSE]  # Select the specified columns from the combined gene expression data
@@ -1997,8 +1817,7 @@ output$balloonPlot <- renderPlot({
       
       
       # Get the patient's disease
-      ## patientDisease <- PatientSearchData[selected_row(), "disease"]
-      patientDisease <- PatientSearchData[which(PatientSearchData$patientID==selected_pat()), "disease"]
+      patientDisease <- PatientSearchData[selected_row(), "disease"]
       
       # Apply gene filter
       mutation_filter <- input$mutation_filter  # Get the selected gene filter option
@@ -2671,8 +2490,7 @@ output$balloonPlot <- renderPlot({
   })
   
   output$spg_filter_label <- renderUI({
-    ## patientDisease <- PatientSearchData[selected_row(), "disease"]
-    patientDisease <- PatientSearchData[which(PatientSearchData$patientID == selected_pat()), "disease"]
+    patientDisease <- PatientSearchData[selected_row(), "disease"]
     disease_label <- paste("Disease: ", patientDisease)
     tagList(
       tags$label(disease_label, style = "font-weight: bold;"),
@@ -2684,16 +2502,9 @@ output$balloonPlot <- renderPlot({
     # Get the selected patient's sample column names
     # get exp, mut, met and cop for selected gene(s)
     
-    # if (!is.null(selected_row())) {  # Check if a row is selected
-    #   patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
-    #   patientDisease <- PatientSearchData[selected_row(), "disease"]
-
-    if (!is.null(selected_pat())) {  # Check if a row is selected
-      patientID <- selected_pat()
-      patientDisease <- PatientSearchData[which(PatientSearchData$patientID == patientID), "disease"]
-       
-      # patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
-      # patientDisease <- PatientSearchData[selected_row(), "disease"]
+    if (!is.null(selected_row())) {  # Check if a row is selected
+      patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
+      patientDisease <- PatientSearchData[selected_row(), "disease"]
       
       ## selected disease samples !!!!
       disease_samples <- PatientSampleData$Sample_Name[PatientSampleData$disease == patientDisease]
@@ -2814,22 +2625,18 @@ output$balloonPlot <- renderPlot({
   
 ## Immune Therapy Treatment *** --------------------------------
   output$trt_info <- renderUI({
-    # req(selected_row())  # Ensure that a row is selected
-    req(selected_pat())  # Ensure that a patient is selected
-    
+    req(selected_row())  # Ensure that a row is selected
     tags$div(
       style = "font-size: 16px; color: #333333;",
       tags$p(
         style = "font-size: 20px; color: blue;",
-        # paste("Patient ID: ",  PatientSearchData[selected_row(), "patientID"])
-        paste("Patient ID: ",  selected_pat())
+        paste("Patient ID: ",  PatientSearchData[selected_row(), "patientID"])
       )
     )
   })
   
   output$trt_filter_label <- renderUI({
-    # patientDisease <- PatientSearchData[selected_row(), "disease"]
-    patientDisease <- PatientSearchData[which(PatientSearchData$patientID ==selected_pat()), "disease"]
+    patientDisease <- PatientSearchData[selected_row(), "disease"]
     disease_label <- paste("Disease: ", patientDisease)
     tagList(
       tags$label(disease_label, style = "font-weight: bold;"),
@@ -2841,14 +2648,10 @@ output$balloonPlot <- renderPlot({
     # Get the selected patient's sample column names
     # get exp, mut, met and cop for selected gene(s)
     
-    # if (!is.null(selected_row())) {  # Check if a row is selected
-    #   patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
-    #  patientDisease <- PatientSearchData[selected_row(), "disease"]
-    cat(selected_pat(), " >> patient for trt entry...\n")
-    if (!is.null(selected_pat())) {  # Check if a row is selected
-      patientID <- selected_pat()  # Get the patient ID of the selected row
-      patientDisease <- PatientSearchData[which(PatientSearchData$patientID == selected_pat()), "disease"]
-        
+    if (!is.null(selected_row())) {  # Check if a row is selected
+      patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
+      patientDisease <- PatientSearchData[selected_row(), "disease"]
+      
       ## selected disease samples !!!!
       disease_samples <- PatientSampleData$Sample_Name[PatientSampleData$disease == patientDisease]
       ## end disease samples
@@ -2935,13 +2738,10 @@ output$balloonPlot <- renderPlot({
     # Get the selected patient's sample column names
     # get exp, mut, met and cop for selected gene(s)
     
-    # if (!is.null(selected_row())) {  # Check if a row is selected
-    #   patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
-    #   patientDisease <- PatientSearchData[selected_row(), "disease"]
-    if (!is.null(selected_pat())) {  # Check if a row is selected
-      patientID <- selected_pat()  # Get the patient ID of the selected row
-      patientDisease <- PatientSearchData[which(PatientSearchData$patientID == patientID), "disease"]
-        
+    if (!is.null(selected_row())) {  # Check if a row is selected
+      patientID <- PatientSearchData[selected_row(), "patientID"]  # Get the patient ID of the selected row
+      patientDisease <- PatientSearchData[selected_row(), "disease"]
+      
       ## selected disease samples !!!!
       disease_samples <- PatientSampleData$Sample_Name[PatientSampleData$disease == patientDisease]
       ## end disease samples

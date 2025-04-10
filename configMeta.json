@@ -5,8 +5,8 @@
     "fullName": "NCI CCR DTB",
     "url": "https://ccr.cancer.gov/Developmental-Therapeutics-Branch",
     "packages":{
-      "patientsData":{
-     // "patientsNberData":{
+     "patientsData":{
+     //  "patientsNberData":{
         "MetaData":[
           {
         		"dataType":"act",
@@ -57,10 +57,24 @@
       //  		"platform":"Illumina Infinium Human Methylation",
       //  		"ref_pmid":""
        // 	},
-         	 {
+        	 {
         		"dataType":"mda",
          		"description":"Patient Metadata",
         		"units":"measure-specific",
+        		"platform":"NA",
+        		"ref_pmid":"NA"
+        	},
+        	 {
+        		"dataType":"sig",
+         		"description":"Patient Transcript Signature",
+        		"units":"mean signature genes",
+        		"platform":"NA",
+        		"ref_pmid":"NA"
+        	},
+        	{
+        		"dataType":"nmf",
+         		"description":"Patient Transcript NMF cluster",
+        		"units":"mean NMF genes",
         		"platform":"NA",
         		"ref_pmid":"NA"
         	},

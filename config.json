@@ -3,8 +3,8 @@
   "patient":{
     "displayName":"Patient data",
     "packages":{
-      "patientsData":{
-    //  "patientsNberData":{
+     "patientsData":{
+     // "patientsNberData":{
         "MolData":[
           {
             "eSetListName":"xsq",
@@ -39,8 +39,19 @@
           {
             "eSetListName":"mda",
             "featurePrefix":"mda",
-            "displayName":"mda: Signatures, Miscellaneous data"
+            "displayName":"mda: Miscellaneous data",
+            "includedFeaturesFile":"Patient_selected_mda.txt"
           },
+          {
+            "eSetListName":"sig",
+            "featurePrefix":"sig",
+            "displayName":"sig: Signatures"
+           },
+           {
+            "eSetListName":"nmf",
+            "featurePrefix":"nmf",
+            "displayName":"nmf: SCLC NMF clusters"
+           },
              {
              "eSetListName":"hll",
              "featurePrefix":"hll",

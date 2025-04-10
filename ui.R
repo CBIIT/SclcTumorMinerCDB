@@ -80,8 +80,8 @@ if (category == "internal") mytitle="<p style='text-align: center; font-size: 20
 shinyUI(
   function(request) {
   fluidPage(
-   ## title="SCLC TumorMiner",
-   title="SCLC TumorMinerCDB",
+   title=appTitle,
+   ## title="SCLC TumorMinerCDB",
   tags$html(lang="en"), 
   ## tags$p(title="TumorMiner"), 
   ## tags$title("TumorMiner"),
@@ -224,7 +224,7 @@ tags$div(class="usa-section",
 	        	  uiOutput("xPrefixUi"),
 	            ## textInput("xId", "Identifier: (e.g. TOP2A)", "TOP2A"),
 	        	  ## 11/07 adc
-	        	  uiOutput("xAdcUi"),
+	   ##     	  uiOutput("xAdcUi"),
 	        	  ## end adc
 	        	  uiOutput("xIdUi"),
 	        	  conditionalPanel(condition="input.ts==1 || input.ts==2 || input.ts==4",
@@ -238,7 +238,7 @@ tags$div(class="usa-section",
 	        	  uiOutput("yPrefixUi"),
 	          	## textInput("yId", "Identifier: (e.g. MKI67)", "MKI67"),
 	        	  ## 11/07 adc
-	        	  uiOutput("yAdcUi"),
+	   ##     	  uiOutput("yAdcUi"),
 	        	  ## end adc
 	        	  uiOutput("yIdUi"),
 	          	uiOutput("yAxisRangeUi"),
@@ -339,6 +339,7 @@ tabPanel("Mutation variants",
 
 #-----[NavBar Tab: Survival]---------------------------------------------------------------------
 ## tabPanel("Survival Analyses", 
+## tabPanel("test"),
 tabPanel("Prognosis Biomarkers", 
          fluidPage(	
            sidebarLayout(
@@ -360,7 +361,8 @@ tabPanel("Prognosis Biomarkers",
                  uiOutput("onco3Ui"),
                  br(),
                  
-                 radioButtons("optsurv","Data type", choices = c("Gene expression" = "xsq", "Gene mutation" = "mut","Metadata/signatures" = "mda" )),
+##                 radioButtons("optsurv","Data type", choices = c("Gene expression" = "xsq", "Gene mutation" = "mut","Metadata/signatures" = "mda" )),
+                 radioButtons("optsurv","Data type", choices = c("Gene expression" = "xsq", "Gene mutation" = "mut","Metadata" = "mda" ,"Signatures" = "sig", "NMFs" = "nmf")),
                  
                  ## textInput("varname",  "Gene(s) Symbol(s) separated by space(s) or any metadata feature", value = "PINK1 BUB1B"),
                  textInput("varname",  "Gene(s) Symbol(s) separated by space(s) or any metadata feature", value = "MKI67"),
@@ -470,6 +472,73 @@ tabPanel("Prognosis Biomarkers",
 
 ### new predictive biomarkers , coming soon--------------------------------------------------------------------
 
+tabPanel("Predictive biomarkers",
+         fluidPage(
+           loadingModal(),
+           sidebarLayout(
+             sidebarPanel(
+               style = "height: 120vh; overflow-y: auto;", 
+               width=3, 
+               tags$div(
+                 id="input_containerpb",
+                 tags$a(id="skiplink"),
+                 #selectInput("xDataset", "x-Axis patient Set", choices=dataSourceChoices, selected = "nci60"),
+                 # HTML(
+                 #   paste("<label class='control-label' for='xDatasetpb'>Horizontal Axis</label>","<select hidden id='xDatasetpb'>",options,"</select>")
+                 # ),  ## hidden for now 
+                 HTML(
+                   paste("<label class='control-label' for='xDatasetpb'>Horizontal Axis</label>","<select hidden id='xDatasetpb'>",options,"</select>")
+                 ),  ## hidden for now 
+                 uiOutput("xPrefixUipb"),
+                 ## textInput("xId", "Identifier: (e.g. TOP2A)", "TOP2A"),
+                 
+                 uiOutput("xIdUipb"),
+                 conditionalPanel(condition="input.tspb==1 || input.tspb==2 || input.tspb==4",
+                                  uiOutput("xAxisRangeUipb") ),
+                 br(),br(),
+                 #selectInput("yDataset", "y-Axis Dataset", choices=dataSourceChoices, selected = "nci60"),
+                 HTML(
+                   paste("<label class='control-label' for='yDatasetpb' id='lyd'>Vertical Axis</label>","<select hidden id='yDatasetpb'>",options,"</select>")
+                 ),
+                 conditionalPanel(condition="input.tspb==1 || input.tspb==2 || input.tspb==4", br(),
+                                  uiOutput("yPrefixUipb"),
+                                  ## textInput("yId", "Identifier: (e.g. MKI67)", "MKI67"),
+                                  ## 11/07 adc
+                                  # uiOutput("yAdcUipb"),
+                                  ## end adc
+                                  uiOutput("yIdUipb"),
+                                  uiOutput("yAxisRangeUipb"),
+                                  
+                                  # checkboxInput("showColor", "Show Color?", value=TRUE),
+                                  br()
+                 ) # end conditional panel
+                 , 
+                 ## radioButtons("tissueSelectionMode", "Select Tissues", c("To include", "To exclude")),
+                 radioButtons("tissueSelectionModepb", "Select Subsets", c("To include", "To exclude")),
+                 ## HTML("<p><b>Select Tissue/s of Origin</b></p>"),
+                 HTML("<p><b>Select Subset(s)</b></p>"),
+                 uiOutput("selectTissuesUipb"),
+                 
+                 conditionalPanel(condition="input.tspb==1 || input.tspb==2 || input.tspb==4",
+                                  checkboxInput("showColorpb", "Show Color?", value=TRUE),
+                                  ## HTML("<p><b>Select Tissue/s to color</b></p>"),
+                                  HTML("<p><b>Select Subset(s) to color</b></p>"),
+                                  uiOutput("showColorTissuesUipb")
+                 ) # end conditional panel
+                 # br(),
+                 # uiOutput("showCellsUi")
+               )
+               
+             ),
+             mainPanel(
+               ## div(style="font-size: 16px", align="center", "CellMinerCDB enables exploration and analysis of cancer cell line pharmacogenomic data across different sources. If publishing results based on this site, please cite: ", a("Rajapakse.VN, Luna.A, Yamade.M et al. iScience, Cell Press. 2018 Dec 12.", href="https://www.cell.com/iscience/fulltext/S2589-0042(18)30219-0", target = "_blank", style="font-size: 16px;", class = "dm")),
+               uiOutput('tabsetPanelpb')
+             )
+           )
+         )
+),
+
+
 ## new Mypatient Module -----------------
 
 myPatientModuleUI("myPatient"),
@@ -566,7 +635,7 @@ tabPanel("Download data",
 #            ), 
 		tabPanel("Help",
 		         tags$a(id="skiplink"),
-		         includeMarkdown("www/files/guide_nopat.md")
+		         includeMarkdown("www/files/guide_sclcpat.md")
 		         ## includeMarkdown("www/files/guide_pat.md")
 		         ## includeHTML("www/files/guide2.html")
 		         #h1("For testing"),

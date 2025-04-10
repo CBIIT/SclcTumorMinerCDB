@@ -1,7 +1,8 @@
 {
   "appName":"SCLC TumorMinerCDB",
+  // "appName":"SCLC TumorMiner",
   "appVersion":"1.0",  
-  "appRelease":"February 2025",
+  "appRelease":"April 2025",
   "runParCorsInParallel":true,
   "runParCorsInParallelThreshold":2000,
    "TopLinks":[

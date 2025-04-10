@@ -314,6 +314,7 @@ shinyServer(function(input, output, session) {
     resu = getDistData()$resu
     sinfo = getDistData()$sinfo
     print(dim(resu))
+    origin_group = resu$disease_source
     ## write.csv(cbind(resu,sinfo), "resu1.csv")
     group_ordered <- with(resu,                       # Order boxes by median
                           reorder(disease_source,
@@ -321,16 +322,20 @@ shinyServer(function(input, output, session) {
                                   function(x) median(x,na.rm=T)))
     resu$disease_source = factor(resu$disease_source,levels = levels(group_ordered))
     ##       ## 
-  
-  
+    ## mycols = c("red","green","blue","brown")
+    ## mycols = c("green","blue","brown","red")
+    mycols = c("green","brown","red","blue")
+    
     p<-ggplot(resu, aes(x=disease_source, y=genexp)) +
       
       ##geom_boxplot(aes(fill = source)) + theme(plot.title = element_text(size=14, face="bold"), legend.text = element_text(size=14),axis.title.x = element_blank(),axis.text.x = element_blank(),axis.ticks.x = element_blank() ) + ggtitle(paste0("Distribution of ",toupper(input$vgene)," gene expression (z-score)"))
-      
-    geom_boxplot(aes(fill = disease_source)) + theme(plot.title = element_text(size=14, face="bold"), legend.text = element_text(size=14),axis.title.x = element_blank(), axis.text.x = element_text(angle = 45) ) + ggtitle(paste0("Distribution of ",toupper(input$geneDist)," gene expression for ",nrow(resu)," patient samples")) +
+    
+      geom_boxplot(aes(fill = origin_group)) +   
+    # geom_boxplot(aes(fill = disease_source)) + 
+      theme_bw() +  theme(plot.title = element_text(size=14, face="bold"), legend.text = element_text(size=14),axis.title.x = element_blank(), axis.text.x = element_text(angle = 0) ) + ggtitle(paste0("Distribution of ",toupper(input$geneDist)," gene expression for ",nrow(resu)," patient samples")) +
     stat_summary(fun.data = function(x){
       return(data.frame(y = max(x)*1.05, label = length(x)))
-    }, geom="text")
+    }, geom="text") + scale_fill_manual(values = mycols)
     
     # g <- ggplotly(p,plotWidth=1000,plotHeight=1400)
     g <- ggplotly(p)
@@ -1295,8 +1300,10 @@ shinyServer(function(input, output, session) {
  
 	#----[Reactive Variables]---------------------------------------------------------------
 	# Record current input validity status, data type prefix values.
-	globalReactiveValues <- reactiveValues(xPrefix = NULL, yPrefix = NULL)
-	
+ 
+	## globalReactiveValues <- reactiveValues(xPrefix = NULL, yPrefix = NULL)
+  globalReactiveValues <- 	 reactiveValues(xPrefix = NULL, yPrefix = NULL, xPrefixpb = NULL, yPrefixpb = NULL)
+ 
 	# Provides a srcContent (list-based) data structure containing all molecular profiling
 	# drug response, and feature/sample annotation data required for the application 
 	# (for data sources specified in the config.json file).
@@ -1562,7 +1569,7 @@ shinyServer(function(input, output, session) {
 	    
 	  } else {
 	    molPharmData <- srcContent[[pcDataset]][["molPharmData"]]
-	    molData <- molPharmData[setdiff(names(molPharmData), c("act","copA","mutA","metA","expA","xaiA","proA","mirA","mdaA","swaA","xsqA","mthA","hisA","criA","mtbA","rrbA","tmmA","tpmA","varA","var","mucA","hllA"))]
+	    molData <- molPharmData[setdiff(names(molPharmData), c("act","copA","mutA","metA","expA","xaiA","proA","mirA","mdaA","swaA","xsqA","mthA","hisA","criA","mtbA","rrbA","tmmA","tpmA","varA","var","mucA","hllA","sigA","nmfA"))]
 	    shiny::validate(need(length(molData)>0, "No molecular data available for this cell line set"))
 	    ##if (length(molData)==0) stop("No molecular data available for this cell line set")
 	    ## old: molData <- lapply(molData, function(X) X[, selectedLines])
@@ -1782,12 +1789,14 @@ shinyServer(function(input, output, session) {
 												 showColorTissues = showColorTissues(), dataSource = input$xDataset, 
 												 xLimVals = xLimits, yLimVals = yLimits,
 												 srcContent = srcContentReactive(),oncolor=oncolor, showCells=input$showCells)
-		p1 <- p1 + theme(axis.text = element_text(size=16), plot.title = element_text(size = 16, hjust = 0.5), 
-		                 axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16))
-	  #theme_update(legend.position = c(0,0))
+		
+		p1 <- p1 + theme(axis.text = element_text(size=16), plot.title = element_text(size = 16, hjust = 0.5), plot.subtitle = element_text(size = 16, hjust = 0.5), 
+		                 axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16)) 
+		p1 <- p1 + labs(subtitle = "salut")
+		#theme_update(legend.position = c(0,0))
 		g1 <- ggplotly(p1, width=plotWidth, height=plotHeight, tooltip=tooltipCol)
 		#g1 <- layout(g1, margin=list(t = 75))
-		g1 <- layout(g1, margin=list(t = 75), legend = list(font = list(size = 18)))
+		g1 <- layout(g1, margin=list(t = 75), legend = list(font = list(size = 18)) )
 		g2 <- config(p = g1,  cloud=FALSE, displaylogo=FALSE, displayModeBar=TRUE,
 								 modeBarButtonsToRemove=c("select2d", "sendDataToCloud", "pan2d", "resetScale2d",
 								 												 "hoverClosestCartesian", "hoverCompareCartesian",
@@ -2411,7 +2420,7 @@ shinyServer(function(input, output, session) {
     opt = "";
     for(y in 1:length(onco3choices)){
      if  (!(onco3choices[y]  %in% c("GInorm_IOWA","PCnorm_TCGA", "Pnorm_IOWA","Tnorm_NIDDK")))  { 
-      if (onco3choices[y]=="SCLC_Tongji")
+      if (onco3choices[y]=="SCLC_TU")
       {
         opt =  paste0(opt,"<option value=",onco3choices[y]," selected>",onco3choices[y],"</option>;")
       }
@@ -2742,6 +2751,7 @@ shinyServer(function(input, output, session) {
   output$xPrefixUi <- renderUI({
   	srcContent <- srcContentReactive()
   	
+  	# cat("source: ", current_2var(), "\n")
   	# The last selected (data type) prefix is recorded in 
   	# globalReactiveValues$xPrefix whenever xData() is updated. When the data set 
   	# is changed, we try to use this same data type prefix, if it is available.
@@ -2808,23 +2818,38 @@ shinyServer(function(input, output, session) {
       {
         if (input$xPrefix == "mda") {
           cellChoices2 <- sort(srcContent[[input$xDataset]][["molPharmData"]][["mdaA"]]$ID)
-          selectInput("xId", "Please select a signature",choices = cellChoices2, selected = "RepStress")
+          selectInput("xId", "Please select a miscellaneous variable",choices = cellChoices2, selected = "TMB")
         } else 
         { 
           # 11/07 adc
-          if (input$xPrefix == "xsq" & length(input$xAdc) != 0)  {
-              if (input$xAdc) {
-                cellChoices3 <- sort(adcgenes$gene)
-                selectInput("xId", "Please select a gene",choices = cellChoices3, selected = "DLK1")
-                } else 
-                {
-                  textInput("xId", "Identifier: (e.g. ASCL1)", xprevious())
-                }
-             }
-            else
-            { 
+          # if (input$xPrefix == "xsq" & length(input$xAdc) != 0)  {
+          #     if (input$xAdc) {
+          #       cellChoices3 <- sort(adcgenes$gene)
+          #       selectInput("xId", "Please select a gene",choices = cellChoices3, selected = "DLK1")
+          #       } else 
+          #       {
+          #         textInput("xId", "Identifier: (e.g. ASCL1)", xprevious())
+          #       }
+          #    }
+          #   else
+          #   { 
+          
+          if (input$xPrefix == "sig") { 
+            cellChoices3 <- sort(srcContent[[input$xDataset]][["molPharmData"]][["sigA"]]$ID)
+            selectInput("xId", "Please select a signature",choices = cellChoices3, selected = "NE_mean")
+          }
+          else 
+          {
+            if (input$xPrefix == "nmf") { 
+              cellChoices3 <- sort(srcContent[[input$xDataset]][["molPharmData"]][["nmfA"]]$ID)
+              selectInput("xId", "Please select an NMF cluster",choices = cellChoices3, selected = "NMF1u")
+            }
+             else
+             {
                 textInput("xId", "Identifier: (e.g. ASCL1)", xprevious()) 
-              }
+             }
+          }
+          #    }
         }
       }
     }
@@ -2868,24 +2893,37 @@ shinyServer(function(input, output, session) {
       {
         if (input$yPrefix == "mda") {
           cellChoices2 <- sort(srcContent[[input$yDataset]][["molPharmData"]][["mdaA"]]$ID)
-          selectInput("yId", "Please select a signature",choices = cellChoices2, selected = "APM")
+          selectInput("yId", "Please select a miscellaneous variable",choices = cellChoices2, selected = "Age")
         } else 
         {
           ##--------------------
           # 11/07 adc
-          if (input$yPrefix == "xsq" & length(input$yAdc) != 0)  {
-            if (input$yAdc) {
-              cellChoices3 <- sort(adcgenes$gene)
-              selectInput("yId", "Please select a gene",choices = cellChoices3, selected = "CD274")
-            } else 
-            {
-              textInput("yId", "Identifier: (e.g. YAP1)", yprevious())
-            }
-          }
-        else
-        { 
-          textInput("yId", "Identifier: (e.g. YAP1)", yprevious()) 
+        #   if (input$yPrefix == "xsq" & length(input$yAdc) != 0)  {
+        #     if (input$yAdc) {
+        #       cellChoices3 <- sort(adcgenes$gene)
+        #       selectInput("yId", "Please select a gene",choices = cellChoices3, selected = "CD274")
+        #     } else 
+        #     {
+        #       textInput("yId", "Identifier: (e.g. YAP1)", yprevious())
+        #     }
+        #   }
+        # else
+        # { 
+        if (input$yPrefix == "sig") {
+          cellChoices3 <- sort(srcContent[[input$yDataset]][["molPharmData"]][["sigA"]]$ID)
+          selectInput("yId", "Please select a signature",choices = cellChoices3, selected = "APM_mean")
         }
+          else
+          {
+            if (input$yPrefix == "nmf") {
+              cellChoices3 <- sort(srcContent[[input$yDataset]][["molPharmData"]][["nmfA"]]$ID)
+              selectInput("yId", "Please select an NMF cluster",choices = cellChoices3, selected = "NMF1r")
+            }
+            else {
+             textInput("yId", "Identifier: (e.g. YAP1)", yprevious()) 
+             }
+          }
+        # }
       }
     }
     }
@@ -3146,7 +3184,16 @@ shinyServer(function(input, output, session) {
     # )
     # print(tissueChoices)
     mylist2 <- convertListTree(tissueChoices)
-    mylist2 = list(no_selection=structure(mylist2, stselected=TRUE))
+    ## mylist2 = list(no_selection=structure(mylist2, stselected=TRUE))
+    
+    mylist2 = list(no_selection=structure(mylist2))
+    attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
+    attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
+    attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
+    attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
+    #
+    attr(mylist2$no_selection,"stopened")=TRUE
+    attr(mylist2$no_selection$DataSet,"stopened")=TRUE
     mylist2
   })
     ## -------------------------------------------------------------------------
@@ -3218,10 +3265,12 @@ shinyServer(function(input, output, session) {
   ## mutation variant ------------------------------------------------------------------
   output$mutationPanelV2 = renderUI({
     
-    
+    # plotPanel <- tabPanel("Plot Data", value=1, uiOutput("showCellsUi"), plotlyOutput("rChartsAlternative", width = plotWidth, height = plotHeight),
+    #                       br(), br(), p("Plot point tooltips provide additional information."))
+    # 
     muttab1 <- tabPanel("View variants", value=1 ,HTML("The following table displays the selected gene mutation variants for all patients with details such as variant allele frequency (VAF), mutation type (Exonic function) and Amino Acid changes (AAChange). The AAChange specfies the cDNA (c.) and the protein (p.) changes for all gene transcripts. All other details can be found by scrolling to the right of the screen."),
                         br(),br(),DT::dataTableOutput("mut_table_v2"))
-    muttab2 <- tabPanel("Oncoplot", value=2,br(), withSpinner(plotOutput("MutationPlot")))
+    muttab2 <- tabPanel("Oncoplot", value=2,br(),HTML(paste0("<p style='text-align:center; font-size: 125%;'><b>Altered in ",mut_input()$nbpat," of total ",mut_input()$totpat, " samples</b></p>")), withSpinner(plotOutput("MutationPlot")))
     ##muttab2 <- tabPanel("Oncoplot", value=2, withSpinner(plotlyOutput("MutationPlotly", width = 1700, height = 1700)))
     
     mutPanel <- tabsetPanel(id="mp",muttab2, muttab1)
@@ -3273,6 +3322,8 @@ shinyServer(function(input, output, session) {
     
     k = which(resu$VAF==0)
     if (length(k)>0) resu = resu[-k,]
+    
+    nbpat = length(unique(resu$sample_Id))
     # dim(resu)
     # add Oncotree level 1 to 3
     sampleann = data.frame(srcContent[[input$dataMut]][["sampleData"]], stringsAsFactors = F, check.names = F)[,c(1,3,4,22,23)]
@@ -3285,13 +3336,14 @@ shinyServer(function(input, output, session) {
     resu2 = resu2[,c(14,6:13,1:5,15:ncol(resu2))] ## new on Dec17
     # create table with dplyr
     resu2$VAF = round(resu2$VAF,3)
-    return(resu2)
+    # return(resu2)
+    return(list(resu2 =resu2, totpat = ncol1, nbpat = nbpat))
     
   })
   
   output$mut_table_v2 <- DT::renderDataTable({
     # ready
-     resu2 = mut_input()
+     resu2 = mut_input()$resu2
      # selsource=metaConfig[[input$dataMut]][["fullName"]]
   
     
@@ -3308,7 +3360,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$MutationPlot <- renderPlot({
-    resu2 = mut_input()
+    resu2 = mut_input()$resu2
     shiny::validate(need(length(unique(resu2$Gene.refGene))>1, "Need at least 2 genes to show oncoplot"))
     knowng = unique(resu2$Gene.refGene)
     # colnames(resu2)[1:14]
@@ -3377,21 +3429,24 @@ shinyServer(function(input, output, session) {
     # oncoplot(maf = maf, clinicalFeatures = 'disease', genes = knowng, 
     #          fontSize = 1, legendFontSize = 1.5, annotationFontSize = 1.5, titleFontSize = 1.5) 
     # 
-  par(mar = c(2, 2, 1, 1))  # Adjust margins
+  # par(mar = c(2, 2, 1, 1))  # Adjust margins
   # oncoplot(maf = maf, clinicalFeatures = 'disease', top=5, sortByAnnotation = T,
   #                  fontSize = 1, legendFontSize = 2.5, annotationFontSize = 2.5, 
   #                  titleFontSize = 1.8, drawColBar = T
   #            )
   
-  oncoplot(maf = maf, clinicalFeatures = 'dataSource', top=5, sortByAnnotation = T,
-           fontSize = 1, legendFontSize = 2.5, annotationFontSize = 2.5, 
-           titleFontSize = 1.8, drawColBar = T
+  # HTML( paste0("Altered in ",nrow(clindata)," of total ",mut_input()$totpat, " samples") )
+
+  par(mar = c(1, 1, 10, 1))  # Adjust margins
+  oncoplot(maf = maf, clinicalFeatures = 'dataSource', top=5, sortByAnnotation = T, barcode_mar = 10,
+           fontSize = 1.2, legendFontSize = 2.5, annotationFontSize = 2.5, gene_mar = 7, showTitle = F ,
+           titleFontSize = 2, drawColBar = F , titleText = paste0("Altered in ",nrow(clindata)," of total ",mut_input()$totpat, " samples")
   )
   
 
   
     
-  } ,  width=1200, height=650
+  } ,  width=1200, height=650 # was 650
   )  
   
   output$MutationPlotly <- renderPlotly({
@@ -3584,6 +3639,906 @@ shinyServer(function(input, output, session) {
   
   #-----[NavBar Tab Server Code2]---------------------------------------------------------
   myPatient <- callModule(myModule, "myPatient", srcContent = srcContent)
+  
+  ## ******************************************************************************************
+  ## --------------- Functions and UI specific to Predictive biomarkers -----------
+  ## ******************************************************************************************
+  
+  ## main TAB ---------------
+  output$tabsetPanelpb = renderUI({
+    
+    # tab4 <- tabPanel("Tissue Correlation", value=4,
+    #                  #downloadLink("downloadData", "Download selected x and y axis data as a Tab-Delimited File"),
+    #                  DT::dataTableOutput("cortable"))
+    tab1 <- tabPanel("View Data", value=2,
+                     downloadLink("downloadDatapb", "Download selected x and y axis data as a Tab-Delimited File"),
+                     DT::dataTableOutput("tablepb"))
+    # tab2 <- tabPanel("Search IDs",
+    #                  includeMarkdown("www/files/help.md"),
+    #                  DT::dataTableOutput("ids"))
+    tab3 <- tabPanel("Compare Patterns", value=3,
+                     includeMarkdown("www/files/help.md"),
+                     #br(),
+                     HTML("<b>Pattern comparison results are computed with respect to that data defined and shared by both the x and y-axis inputs.</b>"),
+                     br(),br(),
+                     fluidRow(
+                       #column(3, selectInput("patternComparisonType", "Pattern Comparison",
+                       #           						choices=c("Molecular Data"="molData", "Drug Data"="drug"), 
+                       #											selected="molData")),
+                       
+                       column(4, HTML(
+                         paste("<label class='control-label' for='patternComparisonTypepb'>Select molecular or activity data</label>","<select id='patternComparisonTypepb'><option value='moldata' selected>Molecular Data</option><option value='drug'>Drug Data</option></select>")
+                       )),
+            
+                       column(8, radioButtons("crossdbpb", label = NULL, choices = list("Compare x-Axis input to x-Axis molecular or activity data" = "No", "Compare x-Axis input to y-Axis molecular or activity data" = "Yes"), selected  = "No", inline=F, width="100%")       
+                       )
+                       
+                     ),
+                     br(),
+                     renderUI({
+                       req(PatternCompTablepb())
+                       downloadLink("downloadDataComppb", "Download All as a Tab-Delimited File")
+                     }),
+                     ##downloadLink("downloadDataComp", "Download All as a Tab-Delimited File"),
+                     withSpinner(DT::dataTableOutput("patternComparisonpb")))
+    
+     
+    
+    plotPanel <- tabPanel("Plot Data", value=1, uiOutput("showCellsUipb"), plotlyOutput("rChartsAlternativepb", width = plotWidth, height = plotHeight),
+                          br(), br(), p("Plot point tooltips provide additional information."))
+    
+    tsPanel <- tabsetPanel(id="tspb",plotPanel, tab1, tab3)
+    #		}
+    
+    return(tsPanel)
+  })
+  
+  ## end main TAB ------------------------------------------------
+  
+  
+  output$downloadDataComppb <- downloadHandler(
+    
+    
+    filename = function() {
+      
+      pcDataset <- input$xDatasetpb
+      pcType <- input$xPrefixpb
+      pcId <- input$xIdpb
+     
+      pcDataset2 <- input$yDatasetpb
+      if (input$crossdbpb == "No") {  
+        ##paste0("Pattern_Comp_all_cdb_",input$patternComparisonSeed,"_",pcDataset,"_",pcType,"_",pcId,"_",input$patternComparisonType,".txt")
+        paste0("Pattern_Comp_all_biomarker_",pcDataset,"_",pcType,"_",pcId,"_",input$patternComparisonTypepb,".txt") 
+      }
+      else {
+        paste0("Pattern_Comp_all_biomarker_",pcDataset,"_",pcType,"_",pcId,"_",input$patternComparisonTypepb,"_from_",pcDataset2,".txt") 
+      }
+    },
+    
+    content = function(file) {
+      
+      write.table(PatternCompTablepb(), file, sep = "\t", row.names = F,quote=F)  
+      
+    }
+  )
+  
+  
+  output$patternComparisonpb <- DT::renderDataTable({
+    results= PatternCompTablepb()	
+    
+    DT::datatable(results, rownames=FALSE, colnames=colnames(results),
+                  filter='top', style='bootstrap', selection = "none",
+                  options=list(lengthMenu = c(10, 50, 100,500), pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipt'))
+    
+  })
+  
+  
+  ##------------
+  PatternCompTablepb <- reactive({
+    srcContent <- srcContentReactive()
+    ## new
+    if (input$crossdbpb == "Yes")
+    {
+      # if (input$patternComparisonSeed == "xPattern"){
+      dat <- xDatapb()
+      pcDataset <- input$yDatasetpb
+      # selectedLines <- names(yData()$data)
+      selectedLines <- as.character(matchedCellLinesTabpb()[, "yDatasetpb"])
+      # } else{
+      #   dat <- yData()
+      #   pcDataset <- input$xDataset
+      #   # selectedLines <- names(xData()$data)
+      #   selectedLines <- as.character(matchedCellLinesTab()[, "xDataset"])
+      # }
+      names(dat$data) = selectedLines
+    }
+    
+    else
+    {
+      
+      # if (input$patternComparisonSeed == "xPattern"){
+      dat <- xDatapb()
+      pcDataset <- input$xDatasetpb
+      # } else{
+      #   dat <- yData()
+      #   pcDataset <- input$yDataset
+      # }
+      selectedLines <- names(dat$data)
+    } # end new
+    
+    
+    shiny::validate(need(length(selectedLines)>0, paste("ERROR:", " No common complete data found.")))
+    shiny::validate(need(length(selectedLines)>2, paste("ERROR:", " No display for less than 3 observations.")))
+    
+    if(input$patternComparisonTypepb == "drug") {
+      shiny::validate(need(srcContent[[pcDataset]][["molPharmData"]][["act"]], "No drug available for this cell line set"))
+      #if (is.null(srcContent[[pcDataset]][["molPharmData"]][["act"]])) stop("No drug available for this cell line set")
+      results <- patternComparison(dat$data,
+                                   srcContent[[pcDataset]][["molPharmData"]][["act"]][, selectedLines, drop=FALSE])
+      results$ids <- rownames(results)
+      results$NAME <- srcContent[[pcDataset]][["drugInfo"]][rownames(results), "NAME"]
+      # OLD
+      # if ("MOA" %in% colnames(srcContent[[pcDataset]][["drugInfo"]])){
+      #   results$MOA <- srcContent[[pcDataset]][["drugInfo"]][rownames(results), "MOA"]
+      #   results <- results[, c("ids", "NAME", "MOA", "COR", "PVAL")]
+      #   colnames(results) <- c("ID", "Name", "MOA", "Correlation", "P-Value")
+      # } else{
+      #   results <- results[, c("ids", "NAME", "COR", "PVAL")]
+      #   colnames(results) <- c("ID", "Name", "Correlation", "P-Value")
+      # }
+      
+      #NEW
+      results$MOA <- srcContent[[pcDataset]][["drugInfo"]][rownames(results), "MOA"]
+      results$CLINICAL.STATUS <- srcContent[[pcDataset]][["drugInfo"]][rownames(results), "CLINICAL.STATUS"]
+      results <- results[, c("ids", "NAME", "MOA", "CLINICAL.STATUS", "COR", "PVAL")]
+      colnames(results) <- c("ID", "Name", "MOA", "CLINICAL.STATUS", "Correlation", "P-Value")
+      # end new
+      
+      DataType <- getMolDataType(results$ID)
+      DrugID <- removeMolDataType(results$ID)
+      results$ID <- NULL
+      results$FDR=p.adjust(results[,"P-Value"],method="BH",nrow(results))
+      results=cbind(DataType,DrugID,results)
+      colnames(results)[1:2]=c("Data Type", "Drug ID")
+      
+    } else {
+      molPharmData <- srcContent[[pcDataset]][["molPharmData"]]
+      molData <- molPharmData[setdiff(names(molPharmData), c("act","copA","mutA","metA","expA","xaiA","proA","mirA","mdaA","swaA","xsqA","mthA","hisA","criA","mtbA","rrbA","tmmA","tpmA","varA","var","mucA","hllA","sigA"))]
+      shiny::validate(need(length(molData)>0, "No molecular data available for this cell line set"))
+      ##if (length(molData)==0) stop("No molecular data available for this cell line set")
+      ## old: molData <- lapply(molData, function(X) X[, selectedLines])
+      ## new selection in case a dataset has only one row
+      ## one solution: molData <- lapply(molData, function(X) subset(X, select=selectedLines))
+      molData <- lapply(molData, function(X) X[, selectedLines,drop=FALSE])
+      results <- patternComparison(dat$data, molData)
+      results$ids <- rownames(results)
+      
+      results$molDataType <- getMolDataType(results$ids)
+      results$gene <- removeMolDataType(results$ids)
+      
+      # Reorder columns
+      results <- results[, c("ids", "molDataType", "gene", "COR", "PVAL")]
+      colnames(results) <- c("ID", "Data Type", "Gene", "Correlation", "P-Value")
+      
+      if (require(rcellminerUtilsCDB)){
+        chromLocs <- character(nrow(results))
+        haveLoc <- results$Gene %in% names(geneToChromBand)
+        chromLocs[haveLoc] <- geneToChromBand[results$Gene[haveLoc]]
+        
+        results$Location <- chromLocs
+        results <- results[, c("ID", "Data Type", "Gene", "Location", "Correlation", "P-Value")]
+      }
+      results$FDR=p.adjust(results[,"P-Value"],method="BH",nrow(results))
+      
+      if (require(geneSetPathwayAnalysis)){
+        # old :results$Annotation <- geneSetPathwayAnalysis::geneAnnotTab[results$Gene, "SHORT_ANNOT"]
+        # issue related to prefix subsetting ex: "age" >> gives "ager"
+        #st=Sys.time()
+        results$Annotation <- geneSetPathwayAnalysis::geneAnnotTab[match(results$Gene,rownames(geneSetPathwayAnalysis::geneAnnotTab)), "SHORT_ANNOT"]
+        #et=Sys.time()
+        #cat(et-st,"\n")
+        results$Annotation[is.na(results$Annotation)] <- ""
+      }
+      
+      results$ID <- NULL
+      colnames(results)[2]="ID"
+    }
+    
+    results[, "Correlation"] <- round(results[, "Correlation"], 3)
+    results[, "P-Value"] <- signif(results[, "P-Value"], 3)
+    results[, "FDR"] <- signif(results[, "FDR"], 3)
+    ## sort by p-value
+    results <- results[order(results[, "P-Value"]),]
+    
+    return(results)
+  })
+  ##--------------
+  
+  output$downloadDatapb <- downloadHandler(
+    filename = function() {
+      query <- parseQueryString(session$clientData$url_search)
+      
+      if("filename" %in% names(query)) {
+        filename <- query[["filename"]]
+      } else {
+        filename <- "Biomarker_dataset"
+      }
+      
+      if("extension" %in% names(query)) {
+        extension <- query[["extension"]]
+      } else {
+        extension <- "txt"
+      }
+      
+      paste(filename, extension, sep=".")
+    },
+    content = function(file) {
+      df <- getPlotData(xData = xDatapb(), yData = yDatapb(), showColor = input$showColorpb, 
+                        showColorTissues = showColorTissuespb(), dataSource = input$xDatasetpb, 
+                        srcContent = srcContentReactive())
+      
+      # Column selection below is to restrict to cell line, x, y features,
+      # and tissue type information (source-provided + OncoTree).
+      
+      dfCols <- c("Cell Line","patientID","paired_sample",colnames(df)[2:3], paste0("OncoTree", 1:2))
+      ### ----------
+      if ("EMT" %in% colnames(df)) {
+        df[,"EMT"] <- gsub("EMT:","",df[,"EMT"])
+        dfCols <- c(dfCols, "EMT")
+      }
+      
+      if ("priorTreatment" %in% colnames(df)) {
+        df[,"priorTreatment"] <- gsub("PriorTreatment:","",df[,"priorTreatment"])
+        dfCols <- c(dfCols, "priorTreatment")
+      }
+      
+      
+      # new stuff
+      if ("sampleType" %in% colnames(df)) {
+        df[,"sampleType"] <- gsub("SampleType:","",df[,"sampleType"])
+        dfCols <- c(dfCols, "sampleType")
+      }
+      if ("biopsySite" %in% colnames(df)) {
+        df[,"biopsySite"] <- gsub("BiopsySite:","",df[,"biopsySite"])
+        dfCols <- c(dfCols, "biopsySite")
+      }
+      # if ("molecularSubtype" %in% colnames(df)) {
+      #   df[,"molecularSubtype"] <- gsub("MolecularSubtype:","",df[,"molecularSubtype"])
+      #   dfCols <- c(dfCols, "molecularSubtype")
+      # }
+      if ("dataSet" %in% colnames(df)) {
+        df[,"dataSet"] <- gsub("DataSet:","",df[,"dataSet"])
+        dfCols <- c(dfCols, "dataSet")
+      }
+      
+      df <- df[, dfCols]
+      # df[, 2] <- round(df[, 2], 3)
+      # df[, 3] <- round(df[, 3], 3)
+      colnames(df)[1]="Patient_sample"
+      
+      ### ----------
+      # dfCols <- c(colnames(df)[1:4], paste0("OncoTree", 1:4))
+      # if ("EMT" %in% colnames(df)) {
+      #   dfCols <- c(dfCols, "EMT")
+      # }
+      # df <- df[, dfCols]
+      
+      write.table(df, file, quote=FALSE, row.names=FALSE, sep="\t")
+    }
+  )
+  
+  output$tablepb <- DT::renderDataTable({
+    # Column selection below is to restrict to cell line, x, y features,
+    # and tissue type information (source-provided + OncoTree).
+    dlDataTab <- getPlotData(xData = xDatapb(), yData = yDatapb(), showColor = input$showColorpb, 
+                             showColorTissues = showColorTissuespb(), dataSource = input$xDatasetpb, 
+                             srcContent = srcContentReactive())
+    
+    # cat(colnames(dlDataTab),"\n")
+    
+    shiny::validate(need(nrow(dlDataTab)>0, paste("ERROR:", " No common complete data found.")))
+    # new stuff
+    dlDataTab[, 2] <- round(dlDataTab[, 2], 3)
+    dlDataTab[, 3] <- round(dlDataTab[, 3], 3)	
+    dlDataTabCols <- c(colnames(dlDataTab)[c(1,21,22,2:4)], paste0("OncoTree", 1:4)) # adding patient ID
+    #
+    ## dlDataTabCols <- c(colnames(dlDataTab)[1:4], paste0("OncoTree", 1:4))
+    if ("EMT" %in% colnames(dlDataTab)) {
+      dlDataTab[,"EMT"] <- gsub("EMT:","",dlDataTab[,"EMT"])
+      dlDataTabCols <- c(dlDataTabCols, "EMT")
+    }
+    
+    if ("priorTreatment" %in% colnames(dlDataTab)) {
+      dlDataTab[,"priorTreatment"] <- gsub("PriorTreatment:","",dlDataTab[,"priorTreatment"])
+      dlDataTabCols <- c(dlDataTabCols, "priorTreatment")
+    }
+    
+    if ("NAPY" %in% colnames(dlDataTab)) {
+      dlDataTabCols <- c(dlDataTabCols, "NAPY")
+    }
+    # new stuff
+    if ("sampleType" %in% colnames(dlDataTab)) {
+      dlDataTab[,"sampleType"] <- gsub("SampleType:","",dlDataTab[,"sampleType"])
+      dlDataTabCols <- c(dlDataTabCols, "sampleType")
+    }
+    if ("biopsySite" %in% colnames(dlDataTab)) {
+      dlDataTab[,"biopsySite"] <- gsub("BiopsySite:","",dlDataTab[,"biopsySite"])
+      dlDataTabCols <- c(dlDataTabCols, "biopsySite")
+    }
+    if ("molecularSubtype" %in% colnames(dlDataTab)) {
+      dlDataTab[,"molecularSubtype"] <- gsub("MolecularSubtype:","",dlDataTab[,"molecularSubtype"])
+      dlDataTabCols <- c(dlDataTabCols, "molecularSubtype")
+    }
+    if ("dataSet" %in% colnames(dlDataTab)) {
+      dlDataTab[,"dataSet"] <- gsub("DataSet:","",dlDataTab[,"dataSet"])
+      dlDataTabCols <- c(dlDataTabCols, "dataSet")
+    }
+    
+    dlDataTab <- dlDataTab[, dlDataTabCols]
+    # dlDataTab[, 2] <- round(dlDataTab[, 2], 3)
+    # dlDataTab[, 3] <- round(dlDataTab[, 3], 3)
+    colnames(dlDataTab)[1]="Patient_sample"
+    ## new filtering
+    dlDataTab = dlDataTab[, -c(6,9,10,15)] # remove tissue, Onco3, Onco4, molecular subtype
+    DT::datatable(dlDataTab, rownames=FALSE, colnames=colnames(dlDataTab),
+                  filter='top', style='bootstrap', selection="none",
+                  extensions = "FixedColumns",
+                  ## options=list(pageLength = nrow(dlDataTab), language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
+                  options=list(scrollX = TRUE, fixedColumns = list(leftColumns = 1), lengthMenu = c(10, 25, 50, 100), pageLength = 10, language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
+    )
+  })
+  
+  
+  
+  output$showCellsUipb <- renderUI({
+    #new
+   
+    
+    dlDataTab <- getPlotData(xData = xDatapb(), yData = yDatapb(), showColor = input$showColorpb, 
+                             showColorTissues = showColorTissuespb(), dataSource = input$xDatasetpb, 
+                             srcContent = srcContentReactive())
+    
+    
+    
+    shiny::validate(need(nrow(dlDataTab)>0, paste("ERROR:", " No common complete data found.")))
+    cellChoices <- dlDataTab[,1]
+    ### cellChoices <- rownames(req(matchedCellLinesTab()))
+    opt = "";
+    for(y in 1:length(cellChoices)){
+      # style works only for browser Chrome
+      opt =  paste0(opt,"<option style='white-space: pre-wrap'>",cellChoices[y],"</option>;");
+    }
+    # HTML(
+    #   paste("<label class='control-label' for='showCells' id='lcells'>Select Patient sample to Color</label>","<select id='showCells' style='word-wrap:break-word; width: 100%;' multiple>",opt,"</select>")
+    # )
+    selectInput("showCellspb", "Select Patient sample to highlight",choices = cellChoices, multiple = TRUE)
+  })
+  
+  
+  output$rChartsAlternativepb <- renderPlotly({
+    #-----[range check]----------------------------------------------------------
+    # Note: Until a better solution can be found, these checks are needed.
+    # The issue is that upon a data source change, there appears to be a moment 
+    # when the xData() or yData() are updated, but the input$xAxisRange
+    # or input$yAxisRange (from the sliderInput UI element) are not yet updated.
+    # As such, the data value range can be out of synch with the invalidated
+    # axis ranges. In the most extreme case, there are no points in the
+    # specified range. The reactive code is quickly re-run with the proper
+    # inputs, correcting the plot, but the error flashes briefly in a buggy 
+    # looking way. 
+    # Below we do a range check and quietly exit if something is amiss (knowing
+    # that the reactivity will ensure that the code is re-run with a proper
+    # set of inputs once thing settle down).
+    #****************************************************************************
+    xData <- xDatapb()
+    yData <- yDatapb()
+    shiny::validate(need(xData$uniqName != yData$uniqName, 
+                         "Please select distinct x and y axis variables."))
+    
+    xValRange <- range(xData$data, na.rm = TRUE)
+    xLimits <- input$xAxisRangepb
+    
+    yValRange <- range(yData$data, na.rm = TRUE)
+    yLimits <- input$yAxisRangepb
+    
+    # req(FALSE) causes immediate but quiet exit.
+    req(!any(is.null(xValRange)), !any(is.null(xLimits)))
+    req(!any(is.null(yValRange)), !any(is.null(yLimits)))
+    req(!any(is.na(xValRange)), !any(is.na(xLimits)))
+    req(!any(is.na(yValRange)), !any(is.na(yLimits)))
+    # commented below
+    # req((xLimits[1] <= xValRange[1]) && (xValRange[2] <= xLimits[2]))
+    # req((yLimits[1] <= yValRange[1]) && (yValRange[2] <= yLimits[2]))
+    
+    cat("xAxis Limits: ", paste0(xLimits, collapse = " "), sep = "\n")
+    cat("X_VAL_RANGE: ",  paste0(xValRange, collapse = " "), sep = "\n")
+    
+    cat("yAxis Limits: ", paste0(yLimits, collapse = " "), sep = "\n")
+    cat("Y_VAL_RANGE: ",  paste0(yValRange, collapse = " "), sep = "\n")
+    cat("-------------------------------------------", sep = "\n")
+    #----------------------------------------------------------------------------
+    
+    p1 <- makePlotStatic(xData = xData, yData = yData, showColor = input$showColorpb, 
+                         showColorTissues = showColorTissuespb(), dataSource = input$xDatasetpb, 
+                         xLimVals = xLimits, yLimVals = yLimits,
+                         srcContent = srcContentReactive(),oncolor=oncolor, showCells=input$showCellspb)
+    p1 <- p1 + theme(axis.text = element_text(size=16), plot.title = element_text(size = 16, hjust = 0.5), 
+                     axis.title.x = element_text(size = 16), axis.title.y = element_text(size = 16))
+    #theme_update(legend.position = c(0,0))
+    g1 <- ggplotly(p1, width=plotWidth, height=plotHeight, tooltip=tooltipCol)
+    #g1 <- layout(g1, margin=list(t = 75))
+    g1 <- layout(g1, margin=list(t = 75), legend = list(font = list(size = 18)))
+    g2 <- config(p = g1,  cloud=FALSE, displaylogo=FALSE, displayModeBar=TRUE,
+                 modeBarButtonsToRemove=c("select2d", "sendDataToCloud", "pan2d", "resetScale2d",
+                                          "hoverClosestCartesian", "hoverCompareCartesian",
+                                          "lasso2d", "zoomIn2d", "zoomOut2d"))
+    g2
+  })
+  
+  
+  showColorTissuespb <- reactive({
+    tree2pb <- input$tree2pb
+    req(tree2pb)
+    ## zz = get_selected(tree, format = "names")
+    
+    showColorTissues = names(unlist(get_selected(tree2pb, format = "slices")))
+    showColorTissues = gsub("\\.",":", showColorTissues)
+    showColorTissues = gsub("no_selection:","", showColorTissues)
+    cat(showColorTissues,"\n")
+    showColorTissues = setdiff(showColorTissues,"no_selection")
+    return(sort(showColorTissues))
+    
+  })
+  
+  output$tree2pb <- renderTree({
+    
+    shiny::validate(need(length(analysisTissueTypespb()) > 0, 
+                         "There are no cell lines of the selected tissue type(s)."))
+    # end new
+    matchedCellLinesTab = matchedCellLinesTabpb()
+    
+    tissueChoices <- getSampleSetTissueTypes(
+      sampleSet = rownames(matchedCellLinesTab),
+      ## sampleSet = rownames(req(matchedCellLinesTab())), 
+      dataSource = input$xDatasetpb, 
+      srcContent = srcContentReactive()
+    ) 
+   
+    mylist2 <- convertListTree(tissueChoices)
+    mylist2 = list(no_selection=structure(mylist2, stselected=TRUE))
+    mylist2
+  })
+  
+  
+  output$showColorTissuesUipb <- renderUI({
+    
+    shinyTree("tree2pb", checkbox = F, theme = "proton")
+    
+    #
+  })
+  
+  
+  output$selectTissuesUipb <- renderUI({
+   
+    
+    # HTML("<p><b>Select Tissue/s of Origin</b></p>")
+    shinyTree("treepb", checkbox = F, theme = "proton")
+    ## end very new ------------------------------------------------------------------- ###
+    
+   
+    # # #
+  })
+  
+  
+  output$treepb <- renderTree({
+    srcContent <- srcContentReactive()
+    tissueToSamplesMap <- srcContent[[input$xDatasetpb]][["tissueToSamplesMap"]]
+    ## tissueTypes <- sort(unique(names(tissueToSamplesMap)))
+    tissueTypes <- unique(names(tissueToSamplesMap)) # no sorting
+    ## very new ------------------------------------------------------------------------###
+    mylist <- convertListTree(tissueTypes)
+    if (input$tissueSelectionModepb == "To include"){
+      mylist = list(all=structure(mylist, stselected=TRUE))
+      
+      
+    } else{ # input$tissueSelectionMode == "To exclude"
+      mylist = list(none=structure(mylist, stselected=TRUE))
+      
+    }
+    mylist
+  })
+  
+  yDatapb <- reactive({
+    ## shiny::validate(need(length(input$selectedTissues) > 0, "Please select tissue types."))
+    shiny::validate(need(length(selectedTissuespb()) > 0, "Please select tissue types."))
+    ## new
+    shiny::validate(need(!is.na(match(input$yPrefixpb,srcContentReactive()[[input$yDatasetpb]][["featurePrefixes"]])), "Non valid data type"))
+    ##
+    
+    yPrefix <- input$yPrefixpb
+    if (!is.character(yPrefix)){
+      yPrefix <- srcContentReactive()[[input$yDatasetpb]][["defaultFeatureY"]]
+    }
+    #
+    originalId <- trimws(input$yIdpb)
+    # 
+    
+    yId <- getMatchedIds(yPrefix, trimws(input$yIdpb), input$yDatasetpb, srcContent = srcContentReactive())
+    
+    if (length(yId) == 0){
+      shiny::validate(need(FALSE, paste("ERROR:", paste0(yPrefix, input$yIdpb), "not found. Please use the Search IDs tab to find available IDs for each dataset.")))
+    } else{
+      globalReactiveValues$yPrefixpb <- yPrefix
+      if (length(yId) > 1){
+        warningMsg <- paste0("Other identifiers matching y-axis ID: ",
+                             paste0(yId[-1], collapse = ", "), ".")
+        showNotification(warningMsg, duration = 10, type = "message")
+        yId <- yId[1]
+      }
+      # yData <- getFeatureData(yPrefix, yId, input$yDataset, srcContent = srcContentReactive())
+      yData <- getFeatureData(yPrefix, yId, input$yDatasetpb, srcContent = srcContentReactive(), originalId)
+      
+      matchedLinesTab <- matchedCellLinesTabpb()
+      # yData$data <- yData$data[matchedLinesTab[, "yDataset"]]
+      yData$data <- yData$data[as.character(matchedLinesTab[, "yDatasetpb"])]
+    }
+    
+    return(yData)
+  })
+  
+  
+  
+  output$yAxisRangeUipb <- renderUI({
+    srcContent <- srcContentReactive()
+    
+    # Note: see comment in output#xAxisRangeUi explaining the use of req().
+    ## new
+    shiny::validate(need(!is.na(match(input$yPrefixpb,srcContentReactive()[[input$yDatasetpb]][["featurePrefixes"]])), "Non valid data type"))
+    
+    valRange <- srcContent[[req(input$yDatasetpb)]][["featureValRanges"]][[req(input$yPrefixpb)]]
+    
+    yData <- NULL
+    try(yData <- yDatapb())
+    if (is.null(yData)){
+      yInitSliderVals <- valRange
+    } else{
+      yDataRange <- range(yData$data, na.rm = TRUE)
+      delta <- max((0.05 * (yDataRange[2] - yDataRange[1])), 0.1)
+      yInitSliderVals <- c((yDataRange[1] - delta), (yDataRange[2] + delta))
+    }
+    
+    ## 	sliderInput("yAxisRange", "y-Axis Range", min = valRange[1], max = valRange[2], value = yInitSliderVals, step = 0.5)
+    sliderInput("yAxisRangepb", "Range", 
+                min = valRange[1], max = valRange[2], value = yInitSliderVals, step = 0.5)
+  })
+  
+  
+  ypreviouspb <- debounce(reactive({
+    if (is.null(input$yIdpb)) "YAP1" else input$yIdpb
+  }), 5000)
+  
+  output$yIdUipb <- renderUI({
+    
+    ## textInput("xId", "Identifier: (e.g. ASCL1)", "ASCL1")
+    
+    if ( length(input$yPrefixpb)!=0 )  {
+      if (input$yPrefixpb == "hll")
+      {
+        # srcContent <- srcContentReactive()
+        cellChoices <- sort(srcContent[[input$yDatasetpb]][["molPharmData"]][["hllA"]]$ID)
+        selectInput("yIdpb", "Please select a pathway",choices = cellChoices, selected = "APOPTOSIS")
+      } else 
+      {
+        if (input$yPrefixpb == "mda") {
+          cellChoices2 <- sort(srcContent[[input$yDatasetpb]][["molPharmData"]][["mdaA"]]$ID)
+          selectInput("yIdpb", "Please select a miscellaneous variable",choices = cellChoices2, selected = "TMB")
+        } else 
+        {
+          ##--------------------
+          # 11/07 adc
+          # if (input$yPrefixpb == "xsq" & length(input$yAdcpb) != 0)  {
+          #   if (input$yAdcpb) {
+          #     cellChoices3 <- sort(adcgenes$gene)
+          #     selectInput("yIdpb", "Please select a gene",choices = cellChoices3, selected = "CD274")
+          #   } else 
+          #   {
+          #     textInput("yIdpb", "Identifier: (e.g. YAP1)", ypreviouspb())
+          #   }
+          # }
+         # else
+          #{ 
+          if (input$yPrefixpb == "sig") {
+            cellChoices3 <- sort(srcContent[[input$yDatasetpb]][["molPharmData"]][["sigA"]]$ID)
+            selectInput("yIdpb", "Please select a signature",choices = cellChoices3, selected = "APM_mean")
+          }
+          else {
+            textInput("yIdpb", "Identifier: (e.g. YAP1)", ypreviouspb()) 
+          }
+          
+          # }
+        }
+      }
+    }
+    else {
+      
+      textInput("yIdpb", "Identifier: (e.g. YAP1)", "YAP1")
+      
+    }
+    
+  })
+  
+  
+  output$yAdcUipb <- renderUI({
+    
+    if ( length(input$yPrefixpb)!=0 )  {
+      if (input$yPrefixpb == "xsq")
+      {
+        ## 11/07 ADC
+        checkboxInput("yAdcpb", "ADC genes ?", value=FALSE)
+        ## end ADC
+      }
+    }
+    
+  })
+  
+  output$yPrefixUipb <- renderUI({
+    srcContent <- srcContentReactive()
+    prefixChoices <- srcContent[[input$yDatasetpb]][["featurePrefixes"]]
+    prefixChoices = sort(prefixChoices, decreasing = T) # Dec 20, 2024
+    ### new
+    ivar = match("var",prefixChoices)
+    if (!is.na(ivar)) 	prefixChoices = prefixChoices[-ivar]
+    ###
+    selectedPrefix <- globalReactiveValues$yPrefixpb
+    if ((is.null(selectedPrefix)) || (!(selectedPrefix %in% prefixChoices))){
+      selectedPrefix <- srcContent[[input$yDatasetpb]][["defaultFeatureY"]]
+    }
+    opt = "";
+    for(y in 1:length(prefixChoices)){
+      if (prefixChoices[y]==selectedPrefix)
+      {
+        opt =  paste0(opt,"<option value=",prefixChoices[y]," selected>",names(prefixChoices)[y],"</option>;")
+      }
+      else
+      {
+        opt =  paste0(opt,"<option value=",prefixChoices[y],">",names(prefixChoices)[y],"</option>;");
+      }
+    }
+    ## selectInput("yPrefix", "y-Axis Type", choices = prefixChoices, selected = selectedPrefix)
+    selectInput("yPrefixpb", "Data Type", choices = prefixChoices, selected = selectedPrefix)
+    
+    # HTML(
+    #   paste("<label class='control-label' for='yPrefix' id='lyp'>y-Axis Data Type</label>","<select id='yPrefix' style='word-wrap:break-word; width: 100%;'>",opt,"</select>")
+    # )
+  })
+  
+  analysisTissueTypespb <- reactive({
+        
+    tissueSelectionMode <- isolate(input$tissueSelectionModepb)
+    
+    
+    selectedTissues = selectedTissuespb()
+  
+    
+    srcContent <- srcContentReactive()
+    tissueToSamplesMap <- srcContent[[input$xDatasetpb]][["tissueToSamplesMap"]]
+    tissueTypes <- names(tissueToSamplesMap)
+    
+    if (tissueSelectionMode == "To include"){
+      if (!("all" %in% selectedTissues)){
+        selectedLines <- unique(c(tissueToSamplesMap[selectedTissues], recursive = TRUE))
+        # For which tissue types are ALL lines in selectedLines?
+        allInSelectedLines <- vapply(tissueToSamplesMap, function(x){
+          all(x %in% selectedLines)
+        }, logical(1))
+        tissueTypes <- names(tissueToSamplesMap[allInSelectedLines])
+      }
+    } else{ # tissueSelectionMode == "Exclude"
+      if (!("none" %in% selectedTissues)){
+        selectedLines <- unique(c(tissueToSamplesMap[selectedTissues], recursive = TRUE))
+        # For which tissue types are NO lines in selectedLines?
+        notInSelectedLines <- vapply(tissueToSamplesMap, function(x){
+          length(intersect(x, selectedLines)) == 0
+        }, logical(1))
+        tissueTypes <- names(tissueToSamplesMap[notInSelectedLines])
+      }
+    }
+    
+    #cat("--- LEAVING analysisTissueTypes()", sep = "\n")
+    
+    return(sort(unique(tissueTypes)))
+  })
+  
+  
+  matchedCellLinesTabpb <- reactive({
+    srcContent <- srcContentReactive()
+    analysisTissueTypes <- analysisTissueTypespb() ### to add
+    
+    if (input$xDatasetpb == input$yDatasetpb){
+      matchedCellLinesTab <- data.frame(
+        xDatasetpb = srcContent[[input$xDatasetpb]]$sampleData[, "Name"],
+        stringsAsFactors = FALSE
+      )
+      matchedCellLinesTab$yDatasetpb <- matchedCellLinesTab$xDatasetpb
+    } else{
+      shiny::validate(need(require(rcellminerUtilsCDB),
+                           "ERROR: x and y axis data sets must be the same."))
+      matchedCellLinesTab <- getMatchedCellLines(c(input$xDatasetpb, input$yDatasetpb))
+      shiny::validate(need(nrow(matchedCellLinesTab) > 0, 
+                           "There are no shared cell lines between the selected datasets."))
+      colnames(matchedCellLinesTab) <- c("xDatasetpb", "yDatasetpb")
+    }
+    stopifnot(all(!duplicated(matchedCellLinesTab$xDatasetpb)))
+    rownames(matchedCellLinesTab) <- matchedCellLinesTab$xDatasetpb
+    
+    tissueMatchedLines <- getTissueTypeSamples(analysisTissueTypes, input$xDatasetpb, srcContent)
+    tissueMatchedLines <- intersect(tissueMatchedLines, rownames(matchedCellLinesTab))
+    
+    shiny::validate(need(length(tissueMatchedLines) > 0, 
+                         "There are no cell lines of the selected tissue type(s)."))
+    
+    matchedCellLinesTab <- matchedCellLinesTab[tissueMatchedLines, ]
+    
+    return(matchedCellLinesTab)
+  })
+  
+  selectedTissuespb <- reactive({
+    treepb <- input$treepb
+    req(treepb)
+    ## zz = get_selected(tree, format = "names")
+    selectedTissuespb = names(unlist(get_selected(treepb, format = "slices")))
+    selectedTissuespb = gsub("\\.",":", selectedTissuespb)
+    selectedTissuespb = gsub("all:","", selectedTissuespb)
+    selectedTissuespb = gsub("none:","", selectedTissuespb)
+    cat(selectedTissuespb,"\n")
+    return(sort(selectedTissuespb))
+    
+  })
+  
+  
+  xDatapb <- reactive({
+    ## shiny::validate(need(length(input$selectedTissues) > 0, "Please select tissue types."))
+    shiny::validate(need(length(selectedTissuespb()) > 0, "Please select tissue types."))
+    ## new
+    cat(input$xPrefixpb," xprefix pb \n")
+    shiny::validate(need(!is.na(match(input$xPrefixpb,srcContentReactive()[[input$xDatasetpb]][["featurePrefixes"]])), "Non valid data type"))
+    ##
+    xPrefix <- input$xPrefixpb
+    if (!is.character(xPrefix)){
+      xPrefix <- srcContentReactive()[[input$xDatasetpb]][["defaultFeatureX"]]
+    }
+    #
+    originalId <- trimws(input$xIdpb)
+    # 
+    xId <- getMatchedIds(xPrefix, trimws(input$xIdpb), input$xDatasetpb, srcContent = srcContentReactive())
+    
+    if (length(xId) == 0){
+      shiny::validate(need(FALSE, paste("ERROR:", paste0(xPrefix, input$xIdpb), "not found. Please use the Search IDs tab to find available IDs for each dataset.")))
+    } else{
+      globalReactiveValues$xPrefixpb <- xPrefix
+      if (length(xId) > 1){
+        warningMsg <- paste0("Other identifiers matching x-axis ID: ",
+                             paste0(xId[-1], collapse = ", "), ".")
+        showNotification(warningMsg, duration = 10, type = "message")
+        xId <- xId[1]
+      }
+      # xData <- getFeatureData(xPrefix, xId, input$xDataset, srcContent = srcContentReactive())
+      xDatapb <- getFeatureData(xPrefix, xId, input$xDatasetpb, srcContent = srcContentReactive(), originalId)
+      
+      matchedLinesTab <- matchedCellLinesTabpb()
+      # xData$data <- xData$data[matchedLinesTab[, "xDataset"]]
+      xDatapb$data <- xDatapb$data[as.character(matchedLinesTab[, "xDatasetpb"])]
+      
+    }
+    
+    return(xDatapb)
+  })
+  
+  
+  output$xPrefixUipb <- renderUI({
+    srcContent <- srcContentReactive()
+    
+    # The last selected (data type) prefix is recorded in 
+    # globalReactiveValues$xPrefix whenever xData() is updated. When the data set 
+    # is changed, we try to use this same data type prefix, if it is available.
+    prefixChoices <- srcContent[[input$xDatasetpb]][["featurePrefixes"]]  ## xsq
+    
+    ## selectedPrefix = srcContent[[input$xDatasetpb]][["defaultFeatureX"]]
+    selectedPrefix= "xsq"
+   ##  prefixChoices = sort(prefixChoices, decreasing = T) ## Dec20, 2024
+    
+    # ### new
+    # ivar = match("var",prefixChoices)
+    # if (!is.na(ivar)) 	prefixChoices = prefixChoices[-ivar]
+    # ###
+    # selectedPrefix <- globalReactiveValues$xPrefix
+    # if ((is.null(selectedPrefix)) || (!(selectedPrefix %in% prefixChoices))){
+    #   selectedPrefix <- srcContent[[input$xDataset]][["defaultFeatureX"]]
+    #   if (is.na(selectedPrefix)) selectedPrefix <- srcContent[[input$xDataset]][["defaultFeatureY"]]
+    # }
+    opt = "";
+    for(y in 1:length(prefixChoices)){
+      if (prefixChoices[y]==selectedPrefix)
+      {
+        opt =  paste0(opt,"<option value=",prefixChoices[y]," selected>",names(prefixChoices)[y],"</option>;")
+      }
+      else
+      {
+        opt =  paste0(opt,"<option value=",prefixChoices[y],">",names(prefixChoices)[y],"</option>;");
+      }
+    }
+    
+    # selectInput("xPrefixpb", "Data Type", choices = prefixChoices, selected = selectedPrefix)
+    
 
+    # HTML(
+    #   paste("<label class='control-label' for='xPrefixpb'>x-Axis Gene Expression</label>","<select hidden id='xPrefixpb' style='word-wrap:break-word; width: 100%;'>",opt,"</select>")
+    # )
+    HTML(
+      paste("<label class='control-label' for='xPrefixpb'></label>","<select hidden id='xPrefixpb' style='word-wrap:break-word; width: 100%;'>",opt,"</select>")
+    )
+    
+  })
+  
+ 
+  
+  output$xIdUipb <- renderUI({
+              cellChoices3 <- sort(adcgenes$gene)
+              selectInput("xIdpb", "Please select a predictive biomarker gene", choices = cellChoices3 , selected = "DLK1" ) 
+              })
+     
+  output$xAxisRangeUipb <- renderUI({
+    srcContent <- srcContentReactive()
+    
+    # Note: req() ensures values are available or 'truthy' (not NULL, "", FALSE, empty, etc.),
+    # returning the value if so; otherwise the operation is stopped with a silent exception.
+    # The idea is to exit quietly if inputs are momentarily in an invalid state, as might
+    # occur when the app is first loading, etc.
+    
+    ## new
+    shiny::validate(need(!is.na(match(input$xPrefixpb,srcContentReactive()[[input$xDataset]][["featurePrefixes"]])), "Non valid data type"))
+    
+    valRange <- srcContent[[req(input$xDatasetpb)]][["featureValRanges"]][[req(input$xPrefixpb)]]
+    
+    xData <- NULL
+    try(xData <- xDatapb())
+    if (is.null(xData)){
+      xInitSliderVals <- valRange
+    } else{
+      xDataRange <- range(xData$data, na.rm = TRUE)
+      delta <- max((0.05 * (xDataRange[2] - xDataRange[1])), 0.1)
+      xInitSliderVals <- c((xDataRange[1] - delta), (xDataRange[2] + delta))
+    }
+    
+    ##  	sliderInput("xAxisRange", "x-Axis Range", min = valRange[1], max = valRange[2], value = xInitSliderVals, step = 0.5)
+    
+    sliderInput("xAxisRangepb", "Range", 
+                min = valRange[1], max = valRange[2], value = xInitSliderVals, step = 0.5)
+  })
+  
+  # current_2var<-reactiveVal(NULL)
+  # current_test<-reactiveVal(NULL)
+  # 
+  # observeEvent(input$nv,{
+  #   cat(input$nv, "..nv\n")
+  #   if(input$nv=="test"){
+  #     cat("OK\n")
+  #     ## updateNavbarPage(session,"2 variable Analyses")
+  #     updateTabsetPanel(session,"nv", selected = "2 variable Analyses")
+  #     # cat(input$nv, "..nv\n")
+  #     current_test(1)
+  #     current_2var(0) 
+  #     cat("OK1 2var", current_2var(),"test ",current_test(), "\n")
+  #   }
+  #   else {
+  #     current_2var(1)
+  #     current_test(0)
+  #     cat("OK2 2var", current_2var(),"test ",current_test(), "\n")
+  #     
+  #   }
+  #   
+  # })
+          
+  ## end---------------------------------------------------------------------------
 })
 #-----[end of shinyServer()]-----------------------------------------------------------------------
