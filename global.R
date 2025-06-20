@@ -16,7 +16,10 @@ OutOfSurvival <- c("CSCLC_NCI","LNET_MyPart","NSCLC_NCI","SCCE_NCI","TNET_NCI","
 # adcgenes0 = adcgenes[, c(1,3,5,2,4,6)]
 
 ## adcgenes = read.delim("Genes53_targetADC_drug_041224.txt")
-adcgenes = read.delim("Genes60_targetADC_drug_112524.txt")
+## adcgenes = read.delim("Genes60_targetADC_drug_112524.txt")
+## adcgenes = read.delim("Genes72_targetADC_drug_06022025.txt")
+adcgenes = read.delim("Genes63_targetADC_drug_06102025.txt")
+
 adcgenes = adcgenes[, c(1,3,5,2,4,6)]
 
 

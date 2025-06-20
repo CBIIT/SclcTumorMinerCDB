@@ -70,6 +70,8 @@ source("dataLoadingFunctions.R")
 #} else{
 #	appTitle <- "CellMiner"
 #}
+cacheDir <- appConfig$cacheDir
+downloadDir <- appConfig$downloadDir
 
 # Construct named character vector mapping displayed data source names to
 # internally used source identifiers.
@@ -135,11 +137,17 @@ sysinfo <- Sys.info()
 if (sysinfo["nodename"]=="discovery.nci.nih.gov" | sysinfo["nodename"]=="ncias-d2059-v.nci.nih.gov") {
 ##db <- cache_filesystem("/srv/shiny-server/cellminercdb_internal/.rcache")
 db <- cache_filesystem("/data/patientMiner/.rcache")
+downloadpath <- "/data/patientMiner-downloads"
  } else {
   if (sysinfo["nodename"]=="discover.nci.nih.gov" | sysinfo["nodename"]=="ncias-p2122-v.nci.nih.gov")  {
-    db <- cache_filesystem("/data/patientMiner/.rcache") }
+    db <- cache_filesystem("/data/patientMiner/.rcache") 
+    downloadpath <- "/data/patientMiner-downloads"
+    }
    else {
-     db <- cache_filesystem("/Users/elloumif/patientCache/.rcache")
+     # db <- cache_filesystem("/Users/elloumif/patientCache/.rcache")
+     # downloadpath <- "/Users/elloumif/patientMiner-downloads"
+     db <- cache_filesystem(cacheDir)
+     downloadpath <- downloadDir
    }
 }
 patternComparison <- memoise(rcellminer::patternComparison, cache = db)
@@ -332,16 +340,16 @@ shinyServer(function(input, output, session) {
     
       geom_boxplot(aes(fill = origin_group)) +   
     # geom_boxplot(aes(fill = disease_source)) + 
-      theme_bw() +  theme(plot.title = element_text(size=14, face="bold"), legend.text = element_text(size=14),axis.title.x = element_blank(), axis.text.x = element_text(angle = 0) ) + ggtitle(paste0("Distribution of ",toupper(input$geneDist)," gene expression for ",nrow(resu)," patient samples")) +
+      theme_bw() +  theme(plot.title = element_text(size=18, face="bold"), legend.text = element_text(size=14),legend.title=element_text(size = 14),axis.title.x = element_blank(), axis.text.x = element_text(angle = 0, size =14) , axis.title.y = element_text(angle = 0, size =14), axis.text.y = element_text(angle = 0, size =14)) + ggtitle(paste0("Distribution of ",toupper(input$geneDist)," gene expression for ",nrow(resu)," patient samples")) +
     stat_summary(fun.data = function(x){
       return(data.frame(y = max(x)*1.05, label = length(x)))
-    }, geom="text") + scale_fill_manual(values = mycols)
+    }, geom="text", size=5.5) + scale_fill_manual(values = mycols)
     
     # g <- ggplotly(p,plotWidth=1000,plotHeight=1400)
     g <- ggplotly(p)
     # g <- ggplotly(p,plotWidth=1400,plotHeight=2000)
     ### g <- layout(g, margin=list(t = 75, b = 0))
-    g <- layout(g, margin=list(t = 75), legend = list(font = list(size = 18)))
+    g <- layout(g, margin=list(t = 75), legend = list(font = list(size = 18)) , hoverlabel = list(font=list(size=20))  )
     g1 <- config(p = g, cloud=FALSE, displaylogo=FALSE, displayModeBar=TRUE,
                  modeBarButtonsToRemove=c("select2d", "sendDataToCloud", "pan2d", "resetScale2d",
                                           "hoverClosestCartesian", "hoverCompareCartesian",
@@ -550,7 +558,7 @@ shinyServer(function(input, output, session) {
       comgenes = intersect(paste0(toupper(optsurv),gl),rownames(geneexp))
       
       shiny::validate(need(length(comgenes)> 0, 
-                           "Error: Gene (or metadata feature) not found !"))
+                           "Error: Gene(s) not found !"))
       
       if (length(comgenes)> 0) 
         ## 
@@ -760,8 +768,15 @@ shinyServer(function(input, output, session) {
     else
     {
       if (optsurv=="mda") 
-      {stitle = " metadata using " } else 
-      {stitle = " mutation of " }
+          stitle = " metadata using "  else 
+        { if (optsurv=="mut")
+            stitle = " mutation of " 
+          else
+           { if (optsurv=="sig")
+                stitle = " signature using "  else 
+                stitle = " NMF cluster using "
+           }
+        }
     }
     
     if (gender=="Both") mesgender = "All" else mesgender = gender
@@ -951,6 +966,17 @@ shinyServer(function(input, output, session) {
     
     ## end improvments
     
+    # if (optsurv=="xsq") {
+    #   if (chkLasso) { stitle = " Average Expression of Lasso selected genes: " } else {
+    #     if (length(comgenes)==1) stitle = " gene expression of "  else stitle = " Average Expression of entered genes: " }
+    # }
+    # else
+    # {
+    #   if (optsurv=="mda") 
+    #   {stitle = " metadata using " } else 
+    #   {stitle = " mutation of " }
+    # }
+    
     if (optsurv=="xsq") {
       if (chkLasso) { stitle = " Average Expression of Lasso selected genes: " } else {
         if (length(comgenes)==1) stitle = " gene expression of "  else stitle = " Average Expression of entered genes: " }
@@ -958,10 +984,17 @@ shinyServer(function(input, output, session) {
     else
     {
       if (optsurv=="mda") 
-      {stitle = " metadata using " } else 
-      {stitle = " mutation of " }
+        stitle = " metadata "  else 
+        { if (optsurv=="mut")
+          stitle = " mutation of " 
+        else
+        { if (optsurv=="sig")
+          stitle = " signature "  else 
+            stitle = " NMF cluster "
+        }
+        }
     }
-    
+
     if (gender=="Both") mesgender = "All" else mesgender = gender
     ###
     if (tlabchange==F) 
@@ -2446,7 +2479,9 @@ shinyServer(function(input, output, session) {
     
     prefixChoices <- srcContent[[input$mdataSource]][["featurePrefixes"]]
     ## prefixChoices <- srcContent[["patient"]][["featurePrefixes"]] ## Dec 20, 2024
-    
+    ii = which(prefixChoices=="xsq")
+    names(prefixChoices)[ii] = paste(names(prefixChoices)[ii], "with batch correction")
+    ##
     selectedPrefix <- globalReactiveValues$xPrefix
     if ((is.null(selectedPrefix)) || (!(selectedPrefix %in% prefixChoices))){
       selectedPrefix <- srcContent[[input$mdataSource]][["defaultFeatureX"]]
@@ -2584,7 +2619,7 @@ shinyServer(function(input, output, session) {
       paste0("sclc_",metaConfig[[input$mdataSource]][["displayName"]],"_",input$dataType,".zip")
     },
     content = function(file) {
-      myfile = paste0("downloads/sclc_",metaConfig[[input$mdataSource]][["displayName"]],"_",input$dataType,".zip")
+      myfile = paste0(downloadpath,"/sclc_",metaConfig[[input$mdataSource]][["displayName"]],"_",input$dataType,".zip")
        
       # if (!file.exists(myfile)) showModal(modalDialog(title="Error", p("file does not exists")))
       #  file.copy(myfile, file)  
@@ -2629,7 +2664,35 @@ shinyServer(function(input, output, session) {
     },
     contentType = "application/zip"
   )
-  ##
+  ## ------------------------------
+  output$downloadExpNOBER <- downloadHandler(
+    
+    # This function returns a string which tells the client
+    # browser what name to use when saving the file.
+    filename = function() {
+      paste0("sclc_Patient data_xsq_noBer",".zip")
+    },
+    content = function(file) {
+      myfile = paste0(downloadpath,"/sclc_Patient data_xsq_noBer.zip")
+      shiny::validate(need(length(analysisTissueTypes()) > 0, 
+                           "There are no cell lines of the selected tissue type(s)."))
+      ## shiny::validate(need(file.exists(myfile), "The file does not exist. Please contact the website administrator"))
+      if (file.exists(myfile)) file.copy(myfile, file)  
+       else
+         shinyalert::shinyalert(
+           # title = "Warning in Cox 2 groups",
+           # text = paste("Message: ",w),
+           title = "File not available.",
+           text = " Please contact the website administrator",
+           type = "error",
+           imageHeight = 150,
+           size ="m"
+         ) 
+      ## file.copy(myfile, file)  
+    },
+    contentType = "application/zip"
+  )
+  
   
   
 ## -----------Download Cell line info
@@ -2798,6 +2861,47 @@ shinyServer(function(input, output, session) {
       }
       }
 
+  })
+  
+  varprevious <- debounce(reactive({
+    if (is.null(input$varname)) "SLFN11" else input$varname
+  }), 2000) # was 5000 
+  
+  output$varUi <- renderUI({
+    
+    if ( length(input$optsurv)!=0 )  {
+      
+        if (input$optsurv == "mda") {
+          cellChoices2 <- sort(srcContent[[input$xDataset]][["molPharmData"]][["mdaA"]]$ID)
+          selectInput("varname", "Please select a miscellaneous variable",choices = cellChoices2, selected = "TMB")
+        } else 
+        { 
+          if (input$optsurv== "sig") { 
+            cellChoices3 <- sort(srcContent[[input$xDataset]][["molPharmData"]][["sigA"]]$ID)
+            selectInput("varname", "Please select a signature",choices = cellChoices3, selected = "NE_mean")
+          }
+          else 
+          {
+            if (input$optsurv == "nmf") { 
+              cellChoices3 <- sort(srcContent[[input$xDataset]][["molPharmData"]][["nmfA"]]$ID)
+              selectInput("varname", "Please select an NMF cluster",choices = cellChoices3, selected = "NMF1u")
+            }
+            else
+            {
+              # textInput("xId", "Identifier: (e.g. ASCL1)", xprevious()) 
+              textInput("varname", "Gene(s) Symbol(s) separated by space(s) (e.g. SLFN11)", varprevious()) 
+            }
+          }
+           
+        }
+      
+    }
+    else 
+      
+    {
+      textInput("varname", "Gene(s) Symbol(s) separated by space(s) (e.g. SLFN11)", "SLFN11")
+    }
+    
   })
   
   xprevious <- debounce(reactive({
@@ -3254,7 +3358,7 @@ shinyServer(function(input, output, session) {
     # HTML(
     #   paste("<label class='control-label' for='showCells' id='lcells'>Select Patient sample to Color</label>","<select id='showCells' style='word-wrap:break-word; width: 100%;' multiple>",opt,"</select>")
     # )
-    selectInput("showCells", "Select Patient sample to highlight",choices = cellChoices, multiple = TRUE)
+    selectInput("showCells", "Select Patient sample to highlight",choices = cellChoices, multiple = TRUE, width='350px')
   })
   
   output$ipAddress <- renderText({
@@ -3803,7 +3907,7 @@ shinyServer(function(input, output, session) {
       
     } else {
       molPharmData <- srcContent[[pcDataset]][["molPharmData"]]
-      molData <- molPharmData[setdiff(names(molPharmData), c("act","copA","mutA","metA","expA","xaiA","proA","mirA","mdaA","swaA","xsqA","mthA","hisA","criA","mtbA","rrbA","tmmA","tpmA","varA","var","mucA","hllA","sigA"))]
+      molData <- molPharmData[setdiff(names(molPharmData), c("act","copA","mutA","metA","expA","xaiA","proA","mirA","mdaA","swaA","xsqA","mthA","hisA","criA","mtbA","rrbA","tmmA","tpmA","varA","var","mucA","hllA","sigA","nmfA"))]
       shiny::validate(need(length(molData)>0, "No molecular data available for this cell line set"))
       ##if (length(molData)==0) stop("No molecular data available for this cell line set")
       ## old: molData <- lapply(molData, function(X) X[, selectedLines])
@@ -4011,7 +4115,7 @@ shinyServer(function(input, output, session) {
     # HTML(
     #   paste("<label class='control-label' for='showCells' id='lcells'>Select Patient sample to Color</label>","<select id='showCells' style='word-wrap:break-word; width: 100%;' multiple>",opt,"</select>")
     # )
-    selectInput("showCellspb", "Select Patient sample to highlight",choices = cellChoices, multiple = TRUE)
+    selectInput("showCellspb", "Select Patient sample to highlight",choices = cellChoices, multiple = TRUE, width='350px')
   })
   
   
@@ -4105,7 +4209,17 @@ shinyServer(function(input, output, session) {
     ) 
    
     mylist2 <- convertListTree(tissueChoices)
-    mylist2 = list(no_selection=structure(mylist2, stselected=TRUE))
+    # mylist2 = list(no_selection=structure(mylist2, stselected=TRUE))
+    # mylist2
+    
+    mylist2 = list(no_selection=structure(mylist2))
+    attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
+    attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
+    attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
+    attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
+    #
+    attr(mylist2$no_selection,"stopened")=TRUE
+    attr(mylist2$no_selection$DataSet,"stopened")=TRUE
     mylist2
   })
   
@@ -4483,7 +4597,8 @@ shinyServer(function(input, output, session) {
  
   
   output$xIdUipb <- renderUI({
-              cellChoices3 <- sort(adcgenes$gene)
+              # cellChoices3 <- sort(adcgenes$gene)
+              cellChoices3 <- sort(unique(adcgenes$gene))
               selectInput("xIdpb", "Please select a predictive biomarker gene", choices = cellChoices3 , selected = "DLK1" ) 
               })
      

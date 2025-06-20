@@ -1,7 +1,7 @@
 {
   
   "patient":{
-    "displayName":" Patient data",
+    "displayName":"Patient data",
     "fullName": "NCI CCR DTB",
     "url": "https://ccr.cancer.gov/Developmental-Therapeutics-Branch",
     "packages":{

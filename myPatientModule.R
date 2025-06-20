@@ -59,18 +59,24 @@ myPatientModuleUI <- function(id) {
               "Clinical Data",
               fluidRow(
                 column(
-                  width = 9,
-                  tags$div(
-                    style = "font-size: 25px; color: #0000FF;", 
-                    textOutput(ns("message"))
-                  ),
+                  width = 12,
+                  # tags$div(
+                  #   style = "font-size: 25px; color: #0000FF;", 
+                  #   textOutput(ns("message"))
+                  # ),
+                 
                   ## h3("Demographic Information"),
-                  uiOutput(ns("patient_demographic_info"))
+                  uiOutput(ns("patient_demographic_info")),
+                  br()
                 ),
                 column(
                   width = 12,
-                  h3("Sample Data"),
-                  DT::dataTableOutput(ns("patient_sample_data")), 
+                  #h3("Sample Data"),
+                  tags$p(style = "font-size: 24px; color: blue;","Sample Data"),
+                  tags$div(
+                  style = "font-size: 21px; color: #333333; border: 2px solid black;",
+                  DT::dataTableOutput(ns("patient_sample_data"))
+                  ), 
                   h4("Please select a row on the Sample Data table and select the Find Similar Patient or Cell line Button to find similar samples"), 
                 ),
                 column(
@@ -817,7 +823,17 @@ PatientSampleData$molecularSubtype <- NULL
             style = "font-size: 24px; color: blue;",
             #Display PatientID
             paste("Patient ID: ", selected_patient_demographic_data$patientID)
+            ##paste("Patient ID: ", selected_patient_demographic_data$patientID, "DataSet: ",selected_patient_demographic_data$dataSet)
           ),
+        
+        tags$div(
+          style = "font-size: 21px; color: #333333; border: 2px solid black; background-color: lightblue;",
+          # tags$p(
+          #   style = "font-size: 24px; color: blue;",
+          #   #Display PatientID
+          #   paste("Patient ID: ", selected_patient_demographic_data$patientID)
+          #   ##paste("Patient ID: ", selected_patient_demographic_data$patientID, "DataSet: ",selected_patient_demographic_data$dataSet)
+          # ),
           tags$div(
             style = "display: flex; justify-content: flex-start; flex-wrap: wrap;",
             tags$span(tags$strong("Gender:"), style = "margin-right: 10px;"),
@@ -827,7 +843,9 @@ PatientSampleData$molecularSubtype <- NULL
             tags$span(tags$strong("Race:"), style = "margin-right: 3px; margin-left: 25px;"),
             selected_patient_demographic_data$race,
             tags$span(tags$strong("Vital Status:"), style = "margin-right: 3px; margin-left: 25px;"),
-            selected_patient_demographic_data$vitalStatus
+            selected_patient_demographic_data$vitalStatus,
+            tags$span(tags$strong("DataSet:"), style = "margin-right: 3px; margin-left: 25px;"),
+            selected_patient_demographic_data$dataSet
           ),
           tags$br(),
           tags$div(
@@ -842,6 +860,7 @@ PatientSampleData$molecularSubtype <- NULL
             selected_patient_demographic_data$disease
           )
         )
+        ) # new
       })
       
       #Display Patient Sample Data
@@ -871,7 +890,8 @@ PatientSampleData$molecularSubtype <- NULL
             list(
               # targets = c(1, 2, 3,5, 6, 7, 8, 14, 16, 22, 23, 24, 25, 26),  # index first column is ZERO !!!
               ## targets = c(1, 2, 3, 4, 5, 6, 7, 8, 14, 16),
-              targets = c(1, 2, 3, 4, 5, 6, 7, 8, 12:18),
+              ## targets = c(1, 2, 3, 4, 5, 6, 7, 8, 12:18),
+              targets = c(1:6,8:9,11,13:18),
               visible = FALSE
             )
           )

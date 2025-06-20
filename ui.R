@@ -266,7 +266,9 @@ tags$div(class="usa-section",
 	        ),
         mainPanel(
          ## div(style="font-size: 16px", align="center", "CellMinerCDB enables exploration and analysis of cancer cell line pharmacogenomic data across different sources. If publishing results based on this site, please cite: ", a("Rajapakse.VN, Luna.A, Yamade.M et al. iScience, Cell Press. 2018 Dec 12.", href="https://www.cell.com/iscience/fulltext/S2589-0042(18)30219-0", target = "_blank", style="font-size: 16px;", class = "dm")),
-        	uiOutput('tabsetPanel')
+         ## tags$head(tags$style(type='text/css', ".nav-tabs {font-size: 16px} ")),
+         style = "font-size: 20px;",
+         uiOutput('tabsetPanel')
         )
     	 )
 			)
@@ -331,6 +333,7 @@ tabPanel("Mutation variants",
                # HTML("The following table displays the selected gene mutation variants for all patients with details such as variant allele frequency (VAF), mutation type (Exonic function) and Amino Acid changes (AAChange). The AAChange specfies the cDNA (c.) and the protein (p.) changes for all gene transcripts. All other details can be found by scrolling to the right of the screen."),
                # br(),br(),
                ## uiOutput('mutationPanel')
+               style = "font-size: 20px;",
                uiOutput('mutationPanelV2')
              )
            )
@@ -364,8 +367,9 @@ tabPanel("Prognosis Biomarkers",
 ##                 radioButtons("optsurv","Data type", choices = c("Gene expression" = "xsq", "Gene mutation" = "mut","Metadata/signatures" = "mda" )),
                  radioButtons("optsurv","Data type", choices = c("Gene expression" = "xsq", "Gene mutation" = "mut","Metadata" = "mda" ,"Signatures" = "sig", "NMFs" = "nmf")),
                  
-                 ## textInput("varname",  "Gene(s) Symbol(s) separated by space(s) or any metadata feature", value = "PINK1 BUB1B"),
-                 textInput("varname",  "Gene(s) Symbol(s) separated by space(s) or any metadata feature", value = "MKI67"),
+                 ### textInput("varname",  "Gene(s) Symbol(s) separated by space(s) or any metadata feature", value = "PINK1 BUB1B"),
+                 # textInput("varname",  "Gene(s) Symbol(s) separated by space(s) or any metadata feature", value = "MKI67"),
+                 uiOutput("varUi"),
                  # br(),
                  # radioButtons("kmtype",label="Data type:", choices=list("Somatic mutation"=0,"Gene expression"=1)),
                  checkboxInput("sampletype", label="With only primary", value = F),
@@ -414,6 +418,7 @@ tabPanel("Prognosis Biomarkers",
                )
              ), #end sidebarPanel
              mainPanel(
+               style = "font-size: 20px;",
                uiOutput('tabsetSurvival')
                # HTML("The survival plots are based on Cox proportional-hazards model. For now we can consider only one gene or one metadata. If you enter a set of genes, we compute the survival based on their average across all patient samples."),
                # br(),br(),
@@ -532,6 +537,7 @@ tabPanel("Predictive biomarkers",
              ),
              mainPanel(
                ## div(style="font-size: 16px", align="center", "CellMinerCDB enables exploration and analysis of cancer cell line pharmacogenomic data across different sources. If publishing results based on this site, please cite: ", a("Rajapakse.VN, Luna.A, Yamade.M et al. iScience, Cell Press. 2018 Dec 12.", href="https://www.cell.com/iscience/fulltext/S2589-0042(18)30219-0", target = "_blank", style="font-size: 16px;", class = "dm")),
+               style = "font-size: 20px;",
                uiOutput('tabsetPanelpb')
              )
            )
@@ -553,8 +559,12 @@ tabPanel("Download data",
                  br(),
                  downloadButton('downloadExp', 'Download Data'),
                  br(),br(),
+                 HTML("<b>Download Footnotes</b>"),br(),
                  downloadButton('downloadFoot', 'Download Footnotes'),
-                 br(),br(),br(),br(),br(),br(),
+                 br(),br(),
+                 HTML("<b>Download RNASeq data without Batch correction</b>"),br(),
+                 downloadButton('downloadExpNOBER', 'Download RNAseq Data'),
+                 br(),br(),br(),br(),
                  HTML("<b>Download current patient set information</b>"),br(),
                  downloadButton('downloadCell', 'Download patients annotation'),
                  br(),br()
