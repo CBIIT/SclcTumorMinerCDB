@@ -707,7 +707,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 #			pcResults$FDR   <- signif(pcResults$FDR, 3)
 			
 			# DT::datatable(pcResults, rownames=FALSE, colnames=colnames(pcResults), filter='top', 
-			#               style='bootstrap', selection = "none",
+			#               style='bootstrap4', selection = "none",
 			#               options=list(lengthMenu = c(10, 25, 50, 100), pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page'))))
 			
 		}
@@ -953,16 +953,16 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 #                     $("a.buttons-excel").css("background","lightblue");
 # 		                               return table;'),
 # 		              rownames=FALSE, colnames=colnames(dat), filter='top', selection = "none",extensions='Buttons',
-# 									style='bootstrap', options=list(pageLength = nrow(dat),language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print',list(extend='excel',filename='regression_data',text='Download'))))
+# 									style='bootstrap4', options=list(pageLength = nrow(dat),language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print',list(extend='excel',filename='regression_data',text='Download'))))
 
 		colnames(dat)[1] = "Patient"
 		DT::datatable(dat, rownames=FALSE, colnames=colnames(dat), filter='top', selection = "none",extensions='Buttons',
-		               style='bootstrap', options=list(pageLength = nrow(dat),language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='regression_data',title='Exported data from CellMinerCDB'), list(extend='excel',filename='regression_data',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='regression_data',title='Exported data from CellMinerCDB')),text = 'download'))))
+		               style='bootstrap4', options=list(pageLength = nrow(dat),language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='regression_data',title='Exported data from CellMinerCDB'), list(extend='excel',filename='regression_data',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='regression_data',title='Exported data from CellMinerCDB')),text = 'download'))))
 		
 			})
 	
 	# DT::datatable(myframe, rownames=FALSE,extensions='Buttons',
-	#               filter='top', style='bootstrap', selection = "none",
+	#               filter='top', style='bootstrap4', selection = "none",
 	#               options=list(pageLength = 10, dom='lipBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = c('csv', 'excel', 'pdf'),text = 'Download')))
 	#               , caption=htmltools::tags$caption(paste0("Identifier search for ",selsource),style="color:dodgerblue; font-size: 18px")
 	              
@@ -1129,16 +1129,16 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 		 # pcResults=cbind(DATATYPE=dtype,NAME=nname,pcResults[,-1])
   ## end new 
 		#  DT::datatable(pcResults, rownames=FALSE, colnames=colnames(pcResults), filter='top', 
-		# 						style='bootstrap', selection = "none",
+		# 						style='bootstrap4', selection = "none",
 		# 							options=list(lengthMenu = c(10, 25, 50, 100), pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page'))))
 		 
 		 # pcResults$FDR=p.adjust(pcResults[,"PVAL"],method="BH",nrow(results))
 		
 		 # DT::datatable(pcResults, rownames=FALSE, colnames=colnames(pcResults),extensions='Buttons',
-		 #               filter='top', style='bootstrap', selection = "none",
+		 #               filter='top', style='bootstrap4', selection = "none",
 		 #               options=list(lengthMenu = c(10, 50, 100, nrow(pcResults)),pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt', buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='partial_corr',title='Exported data from CellMinerCDB'), list(extend='excel',filename='partial_corr',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='partial_corr',title='Exported data from CellMinerCDB')),text = 'Download'))))
 		 DT::datatable(pcResults, rownames=FALSE, colnames=colnames(pcResults),
-		               filter='top', style='bootstrap', selection = "none",
+		               filter='top', style='bootstrap4', selection = "none",
 		               options=list(lengthMenu = c(10, 50, 100, 500),pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipt'))
 		  
 		 
@@ -1160,7 +1160,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 		deResults$QVAL <- signif(deResults$QVAL, 3)
 		
 		DT::datatable(deResults, rownames=FALSE, colnames=colnames(deResults), filter='top', 
-									style='bootstrap', selection = "none",
+									style='bootstrap4', selection = "none",
 									options=list(lengthMenu = c(10, 25, 50, 100), pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page'))))
 	})
 	
@@ -1168,7 +1168,7 @@ regressionModels <- function(input, output, session, srcContentReactive, appConf
 		enResults <- enrichmentResultsTab()
 		
 		DT::datatable(enResults, rownames=FALSE, colnames=colnames(enResults), 
-									filter='top', style='bootstrap', selection = "none",
+									filter='top', style='bootstrap4', selection = "none",
 									options=list(lengthMenu = c(10, 25, 50, 100), pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page'))))
 	})
 	

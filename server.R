@@ -1101,7 +1101,7 @@ shinyServer(function(input, output, session) {
     if (input$Lasso) selsource = "Lasso Cox" else selsource ="Cox Multivariate"
     colnames(resu)[2] = "Hazard Ratio (HR)"
     resu = resu[,c(2,3,1), drop =F]
-    DT::datatable(resu, filter='top', selection = "none", style='bootstrap', rownames = T,caption=htmltools::tags$caption(paste0("Genes Hazard ratio using ",selsource),style="color:dodgerblue; font-size: 18px") )
+    DT::datatable(resu, filter='top', selection = "none", style='bootstrap4', rownames = T,caption=htmltools::tags$caption(paste0("Genes Hazard ratio using ",selsource),style="color:dodgerblue; font-size: 18px") )
     
   })
   
@@ -1894,7 +1894,7 @@ shinyServer(function(input, output, session) {
   	## new filtering
   	dlDataTab = dlDataTab[, -c(6,9,10,15)] # remove tissue, Onco3, Onco4, molecular subtype
   	DT::datatable(dlDataTab, rownames=FALSE, colnames=colnames(dlDataTab),
-  								filter='top', style='bootstrap', selection="none",
+  								filter='top', style='bootstrap4', selection="none",
   								extensions = "FixedColumns",
   								## options=list(pageLength = nrow(dlDataTab), language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
   								options=list(scrollX = TRUE, fixedColumns = list(leftColumns = 1), lengthMenu = c(10, 25, 50, 100), pageLength = 10, language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
@@ -1907,7 +1907,7 @@ shinyServer(function(input, output, session) {
 	  rescor= CorrelationTable(xData(),yData(),srcContentReactive())
 	  
 	  DT::datatable(rescor, rownames=FALSE, colnames=colnames(rescor),extensions='Buttons',
-	                filter='top', style='bootstrap', selection="none",
+	                filter='top', style='bootstrap4', selection="none",
 	                options=list(pageLength = nrow(rescor), language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt', buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='tissue_correlation',title='Exported data from CellMinerCDB'), list(extend='excel',filename='tissue_correlation',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='tissue_correlation',title='Exported data from CellMinerCDB')),text = 'Download'))))
 	 
 	  })
@@ -1948,7 +1948,7 @@ shinyServer(function(input, output, session) {
 	  colnames(results) <- c("Data type","ID ", "Drug Name", "Drug MOA")
 	  selsource=metaConfig[[input$xDataset]][["fullName"]]
 	  DT::datatable(results, rownames=FALSE, colnames=colnames(results),
-	                filter='top', style='bootstrap', selection = "none",
+	                filter='top', style='bootstrap4', selection = "none",
 	                options=list(pageLength = 10, language=list(paginate = list(previous = 'Previous page', `next`= 'Next page'))), caption=htmltools::tags$caption(paste0("Ids table for ",selsource),style="color:dodgerblue; font-size: 18px"))
 	})
 		#--------------------------------------------------------------------------------------
@@ -1989,12 +1989,12 @@ shinyServer(function(input, output, session) {
 	  
 	  selsource=metaConfig[[input$dataSrc]][["fullName"]]
 	  # DT::datatable(myframe, rownames=FALSE,extensions='Buttons',
-	  #               filter='top', style='bootstrap', selection = "none",
+	  #               filter='top', style='bootstrap4', selection = "none",
 	  #               options=list(pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='search_id',title='Exported data from CellMinerCDB'), list(extend='excel',filename='search_id',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='search_id',title='Exported data from CellMinerCDB')),text = 'Download')))
 	  #               , caption=htmltools::tags$caption(paste0("Identifier search for ",selsource),style="color:dodgerblue; font-size: 18px")
 
 	                DT::datatable(myframe, rownames=FALSE,extensions='Buttons',
-	                              filter='top', style='bootstrap', selection = "none",
+	                              filter='top', style='bootstrap4', selection = "none",
 	                              options=list(pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipfBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='search_id',title='Exported data from CellMinerCDB'), list(extend='excel',filename='search_id',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='search_id',title='Exported data from CellMinerCDB')),text = 'Download')))
 	                              , caption=htmltools::tags$caption(paste0("Please use the boxes on top of the columns ","for specific search"),style="color:dodgerblue; font-size: 18px") 
 	          
@@ -2036,7 +2036,7 @@ shinyServer(function(input, output, session) {
 	  colnames(results) <- c("Data type","ID ", "Drug Name", "Drug MOA")
 	  selsource=metaConfig[[input$dataSrc]][["fullName"]]
 	  DT::datatable(results, rownames=FALSE, colnames=colnames(results),extensions='Buttons',
-	                filter='top', style='bootstrap', selection = "none",
+	                filter='top', style='bootstrap4', selection = "none",
 	                options=list(pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='search_id'), list(extend='excel',filename='search_id'), list(extend='pdf',filename='search_id')),text = 'Download')))
 	                , caption=htmltools::tags$caption(paste0("Identifier search for ",selsource),style="color:dodgerblue; font-size: 18px")
 	  )})
@@ -2114,10 +2114,10 @@ shinyServer(function(input, output, session) {
     
     
 	  # DT::datatable(results, rownames=FALSE, colnames=colnames(results),extensions='Buttons',
-	  # 							filter='top', style='bootstrap', selection = "none",
+	  # 							filter='top', style='bootstrap4', selection = "none",
 	  # 							options=list(lengthMenu = c(10, 50, 100,500), pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt', buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='pattern_comp',title='Exported data from CellMinerCDB'), list(extend='excel',filename='pattern_comp',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='pattern_comp',title='Exported data from CellMinerCDB')),text = 'Download'))))
 	  DT::datatable(results, rownames=FALSE, colnames=colnames(results),
-	                filter='top', style='bootstrap', selection = "none",
+	                filter='top', style='bootstrap4', selection = "none",
 	                options=list(lengthMenu = c(10, 50, 100,500), pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipt'))
 	  
 	})
@@ -2133,7 +2133,7 @@ shinyServer(function(input, output, session) {
 														 "Platform/Assay", "PubMed Ref. ID")
 		
 		DT::datatable(jsonFrame, rownames=FALSE, colnames=colnames(jsonFrame),
-									filter='top', style='bootstrap', selection = "none",
+									filter='top', style='bootstrap4', selection = "none",
 									options=list(pageLength = 10,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page'))),escape=F)
 	})
 	#---------------------------------------------------------------------------------------
@@ -3291,10 +3291,10 @@ shinyServer(function(input, output, session) {
     ## mylist2 = list(no_selection=structure(mylist2, stselected=TRUE))
     
     mylist2 = list(no_selection=structure(mylist2))
-    attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
-    attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
-    attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
-    attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$NCI) ) attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$TU) ) attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$UoC) ) attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$UR) ) attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
     #
     attr(mylist2$no_selection,"stopened")=TRUE
     attr(mylist2$no_selection$DataSet,"stopened")=TRUE
@@ -3452,7 +3452,7 @@ shinyServer(function(input, output, session) {
   
     
     DT::datatable(resu2, rownames=TRUE,extensions='Buttons',
-                  filter='top', style='bootstrap', selection = "none",
+                  filter='top', style='bootstrap4', selection = "none",
                   options=list(
                                columnDefs = list(list(targets = c(0,8,12,15:ncol(resu2)), visible=FALSE )),
                                ## columnDefs = list(list(targets = c(0,9,12,15:ncol(resu2)), visible=FALSE )),
@@ -3678,13 +3678,13 @@ shinyServer(function(input, output, session) {
     # ready
     selsource=metaConfig[[input$dataMut]][["fullName"]]
     # DT::datatable(resu2, rownames=FALSE,extensions='Buttons',
-    #               filter='top', style='bootstrap', selection = "none",
+    #               filter='top', style='bootstrap4', selection = "none",
     #               options=list(pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='Sarcoma_variants',title='Exported data from CellMinerCDB'), list(extend='excel',filename='Sarcoma_variants',title='Exported data from CellMinerCDB'), list(extend='pdf',filename='Sarcoma_variants',title='Exported data from CellMinerCDB')),text = 'Download')))
     #               , caption=htmltools::tags$caption(paste0("Mutation variants details for ",selsource),style="color:dodgerblue; font-size: 18px")
     # )
 
     DT::datatable(resu2, rownames=TRUE,extensions='Buttons',
-                  filter='top', style='bootstrap', selection = "none",
+                  filter='top', style='bootstrap4', selection = "none",
                   options=list(columnDefs = list(list(targets = c(0,6,7,14:ncol(resu2)), visible=FALSE )),pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipBt',buttons = list('colvis','copy', 'print', list(extend = 'collection',buttons = list(list(extend='csv',filename='TumorMiner_variants',title='Exported data from TumorMiner'), list(extend='excel',filename='TumorMiner_variants',title='Exported data from TumorMiner'), list(extend='pdf',filename='TumorMiner_variants',title='Exported data from TumorMiner')),text = 'Download') ))
                   , caption=htmltools::tags$caption(paste0("Mutation variants details for ",selsource),style="color:dodgerblue; font-size: 18px")
     )
@@ -3831,7 +3831,7 @@ shinyServer(function(input, output, session) {
     results= PatternCompTablepb()	
     
     DT::datatable(results, rownames=FALSE, colnames=colnames(results),
-                  filter='top', style='bootstrap', selection = "none",
+                  filter='top', style='bootstrap4', selection = "none",
                   options=list(lengthMenu = c(10, 50, 100,500), pageLength = 100,language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')) ,dom='lipt'))
     
   })
@@ -4085,7 +4085,7 @@ shinyServer(function(input, output, session) {
     ## new filtering
     dlDataTab = dlDataTab[, -c(6,9,10,15)] # remove tissue, Onco3, Onco4, molecular subtype
     DT::datatable(dlDataTab, rownames=FALSE, colnames=colnames(dlDataTab),
-                  filter='top', style='bootstrap', selection="none",
+                  filter='top', style='bootstrap4', selection="none",
                   extensions = "FixedColumns",
                   ## options=list(pageLength = nrow(dlDataTab), language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
                   options=list(scrollX = TRUE, fixedColumns = list(leftColumns = 1), lengthMenu = c(10, 25, 50, 100), pageLength = 10, language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
@@ -4213,10 +4213,15 @@ shinyServer(function(input, output, session) {
     # mylist2
     
     mylist2 = list(no_selection=structure(mylist2))
-    attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
-    attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
-    attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
-    attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$NCI) ) attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$TU) ) attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$UoC) ) attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
+    if (! is.null(mylist2$no_selection$DataSet$UR) ) attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
+    
+    # attr(mylist2$no_selection$DataSet$NCI,"stselected")=TRUE
+    # attr(mylist2$no_selection$DataSet$TU,"stselected")=TRUE
+    # attr(mylist2$no_selection$DataSet$UoC,"stselected")=TRUE
+    # attr(mylist2$no_selection$DataSet$UR,"stselected")=TRUE
     #
     attr(mylist2$no_selection,"stopened")=TRUE
     attr(mylist2$no_selection$DataSet,"stopened")=TRUE

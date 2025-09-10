@@ -2,17 +2,36 @@
 # and prevent user from removing it.
 onloadJs <- '
 $(document).ready(function() {
-  $("#loadingModal").modal({backdrop: "static", keyboard: false, show: true});
+ //  $("#loadingModal").modal({backdrop: "static", keyboard: false, show: true}); old
 
-  // $("#but1").prop("disabled",true) 
+ 
+
+ // Get a reference to the modal element
+var loadingModalEl = document.getElementById("loadingModal");
+
+// Create the modal instance with options
+var loadingModal = new bootstrap.Modal(loadingModalEl, {
+  backdrop: "static",
+  keyboard: false,
+});
+
+// Show the modal
+loadingModal.show();
+
+
+  
+  
+
+     // $("#but1").prop("disabled",true)  ## very old
   $("#but1").hide()
-
+   
   $("#video1").on("ended", function() {
    //TO DO: Your code goes here...
      setTimeout( 
          function() {
            // alert("Video Finished");
-         $("#loadingModal").modal("hide");
+          $("#loadingModal").modal("hide");
+        
          },
        5000
      ) ;
@@ -25,7 +44,7 @@ appConfig <- jsonlite::fromJSON("appConfig.json")
 pmodal <- appConfig$modal
 vtitle <- "Loading Data ... (~30 seconds)"
 if (is.null(pmodal)){
-  ## vclass = "modal-dialog modal-sm" ## BS3
+  ## vclass = "modal-dialog modal-sm"
   vclass = "modal-dialog"
   disp_content <- as.character(tags$div(
     class="progress progress-striped active",
@@ -38,8 +57,10 @@ if (is.null(pmodal)){
   disp_foot <- ''
   vstyle = ''
 } else {
-  disp_foot <- '<button id="but1" type="button" class="btn btn-primary" style="font-size: 25px;" data-dismiss="modal"> Skip presentation</button>'
-  vclass = "modal-dialog modal-lg"
+  ## changed data-dismiss to data-bs-dismiss in BS5
+  disp_foot <- '<button id="but1" type="button" class="btn btn-primary" style="font-size: 25px;" data-bs-dismiss="modal"> Skip presentation</button>'
+  ## vclass = "modal-dialog modal-lg"
+  vclass = "modal-dialog modal-xl"
   vstyle = "width: 80%; max-height: calc(100% -200px); overflow-y: auto;"
   if (length(grep(".png",pmodal)!=0))
   {

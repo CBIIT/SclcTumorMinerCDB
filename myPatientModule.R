@@ -625,7 +625,7 @@ PatientSampleData$molecularSubtype <- NULL
   #Display Patient Search Data
   output$myPatientSearchData <- renderDT(
     PatientSearchData,
-    filter = "top", style="bootstrap" ,
+    filter = "top", style="bootstrap4" ,
     rownames = FALSE,
     server = FALSE,
     ## selection = "single",
@@ -868,7 +868,7 @@ PatientSampleData$molecularSubtype <- NULL
         selected_patient_sample_data,
         select = "single",
         extensions = 'Buttons',
-        filter='top', style='bootstrap' ,
+        filter='top', style='bootstrap4' ,
         options = list(
           dom = 'Bfrtip',
          scrollX = TRUE,
@@ -1680,20 +1680,20 @@ output$balloonPlot <- renderPlot({
   output$find_similar_patient_data <- DT::renderDataTable({
     # datatable(
     #   patient_to_patient(), rownames = F,
-    #   filter='top', style='bootstrap', selection = "none",extensions = "FixedColumns",
+    #   filter='top', style='bootstrap4', selection = "none",extensions = "FixedColumns",
     #   options=list(scrollX = TRUE, fixedColumns = list(leftColumns = 1), lengthMenu = c(10, 25, 50, 100), pageLength = 10, language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
     # )
     
     datatable(
       patient_to_patient(), rownames = F,
-      filter='top', style='bootstrap', selection = "none",
+      filter='top', style='bootstrap4', selection = "none",
       options=list(scrollX = TRUE,lengthMenu = c(10, 25, 50, 100), pageLength = 10, language=list(paginate = list(previous = 'Previous page', `next`= 'Next page')))
     )
     
     # datatable(
     #   filter = "top", 
     #   patient_to_patient(),
-    #   style='bootstrap', selection = "none",
+    #   style='bootstrap4', selection = "none",
     #   options = list(
     #     columnDefs = list(
     #       list(visible = FALSE, targets = c(0, 5, 6, 7, 8))  
@@ -1938,7 +1938,7 @@ output$balloonPlot <- renderPlot({
 
   output$gene_expression_data <- DT::renderDataTable({
     datatable(
-      filter = "top",  style='bootstrap' ,
+      filter = "top",  style='bootstrap4' ,
       filter_gene_expression(),
       extensions = 'Buttons',
       options = list(
@@ -2196,7 +2196,7 @@ output$balloonPlot <- renderPlot({
   output$mutation_data <- DT::renderDataTable({
     datatable(
       filter_mutation(),
-      filter = "top", style='bootstrap' ,
+      filter = "top", style='bootstrap4' ,
       extensions = 'Buttons',
       options = list(
         columnDefs = list(
@@ -2431,7 +2431,7 @@ output$balloonPlot <- renderPlot({
   output$methylation_data <- DT::renderDataTable({
     datatable(
       filter_methylation(),
-      filter = "top" , style='bootstrap' ,
+      filter = "top" , style='bootstrap4' ,
       extensions = 'Buttons',
       options = list(
         columnDefs = list(
@@ -2662,7 +2662,7 @@ output$balloonPlot <- renderPlot({
   output$copy_data <- DT::renderDataTable({
     datatable(
       filter_copy(),
-      filter = "top" , style='bootstrap' ,
+      filter = "top" , style='bootstrap4' ,
       extensions = 'Buttons',
       options = list(
         columnDefs = list(
@@ -2815,7 +2815,7 @@ output$balloonPlot <- renderPlot({
   output$spg_data <- DT::renderDataTable({
     datatable(
       my_spg(), rownames = F,
-      filter = "top" , style='bootstrap' ,
+      filter = "top" , style='bootstrap4' ,
   #    extensions = 'Buttons',
       options = list(
       #   columnDefs = list(
@@ -3076,7 +3076,7 @@ output$balloonPlot <- renderPlot({
   output$trt_data <- DT::renderDataTable({
     datatable(
       my_trt(), rownames = F,
-      filter = "top" , style='bootstrap' ,
+      filter = "top" , style='bootstrap4' ,
       extensions = 'Buttons',
       options = list(
           columnDefs = list(
@@ -3130,7 +3130,7 @@ output$balloonPlot <- renderPlot({
       myframe,
       container = sketch, ## new head ****
       rownames = F,
-      filter = "top" , style='bootstrap' ,
+      filter = "top" , style='bootstrap4' ,
       extensions = 'Buttons',
       options = list(
         columnDefs = list(

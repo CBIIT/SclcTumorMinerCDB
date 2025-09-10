@@ -18,7 +18,7 @@ toplinks <- appConfig$TopLinks
 category <- appConfig$category
 banner <- appConfig$banner
 
-source("modal1.R")
+source("modal_bs5.R")
 source("appUtils.R")
 
 if (!is.null(appConfig$appName)){
@@ -80,6 +80,7 @@ if (category == "internal") mytitle="<p style='text-align: center; font-size: 20
 shinyUI(
   function(request) {
   fluidPage(
+   theme = bslib::bs_theme(version=5),
    title=appTitle,
    ## title="SCLC TumorMinerCDB",
   tags$html(lang="en"), 
@@ -166,6 +167,13 @@ tags$div(class="usa-section",
 						 							     paste0(".navbar-default .navbar-brand { font-size: 24px; color: dodgerblue; }")
 						 							   )
 						 							   )
+						 							 ),
+						 							 tags$head(						 				      
+						 							  tags$style(HTML("
+                               .navbar-nav .nav-link {
+                                font-size: 1.5rem; /* Adjust this value as needed */
+                                }
+                             "))
 						 							 ),
 						 							 # tags$head(tags$title("TumorMiner")),
 						 							 tags$head(HTML("<title>TumorMiner</title>")),
@@ -268,7 +276,44 @@ tags$div(class="usa-section",
          ## div(style="font-size: 16px", align="center", "CellMinerCDB enables exploration and analysis of cancer cell line pharmacogenomic data across different sources. If publishing results based on this site, please cite: ", a("Rajapakse.VN, Luna.A, Yamade.M et al. iScience, Cell Press. 2018 Dec 12.", href="https://www.cell.com/iscience/fulltext/S2589-0042(18)30219-0", target = "_blank", style="font-size: 16px;", class = "dm")),
          ## tags$head(tags$style(type='text/css', ".nav-tabs {font-size: 16px} ")),
          style = "font-size: 20px;",
-         uiOutput('tabsetPanel')
+         ## uiOutput('tabsetPanel')
+         
+         tabsetPanel(id="ts",
+                     tabPanel("Plot Data", value=1, uiOutput("showCellsUi"), plotlyOutput("rChartsAlternative", width = plotWidth, height = plotHeight),
+                              br(), br(), p("Plot point tooltips provide additional information.")),
+                     tabPanel("View Data", value=2,
+                              downloadLink("downloadData", "Download selected x and y axis data as a Tab-Delimited File"),
+                              DT::dataTableOutput("table")), 
+                     tabPanel("Compare Patterns", value=3,
+                              includeMarkdown("www/files/help.md"),
+                              #br(),
+                              HTML("<b>Pattern comparison results are computed with respect to that data defined and shared by both the x and y-axis inputs.</b>"),
+                              br(),br(),
+                              fluidRow(
+                                #column(3, selectInput("patternComparisonType", "Pattern Comparison",
+                                #           						choices=c("Molecular Data"="molData", "Drug Data"="drug"), 
+                                #											selected="molData")),
+                                
+                                column(4, HTML(
+                                  paste("<label class='control-label' for='patternComparisonType'>Select molecular or activity data</label>","<select id='patternComparisonType'><option value='moldata' selected>Molecular Data</option><option value='drug'>Drug Data</option></select>")
+                                )),
+                                
+                                column(8, radioButtons("crossdb", label = NULL, choices = list("Compare x-Axis input to x-Axis molecular or activity data" = "No", "Compare x-Axis input to y-Axis molecular or activity data" = "Yes"), selected  = "No", inline=F, width="100%")       
+                                )
+                                
+                              ),
+                              br(),
+                              renderUI({
+                                req(PatternCompTable())
+                                downloadLink("downloadDataComp", "Download All as a Tab-Delimited File")
+                              }),
+                              ##downloadLink("downloadDataComp", "Download All as a Tab-Delimited File"),
+                              withSpinner(DT::dataTableOutput("patternComparison")))
+                     # tabPanel("Tissue Correlation", value=4,
+                     #          #downloadLink("downloadData", "Download selected x and y axis data as a Tab-Delimited File"),
+                     #          DT::dataTableOutput("cortable"))
+         )
+         
         )
     	 )
 			)
@@ -538,7 +583,42 @@ tabPanel("Predictive biomarkers",
              mainPanel(
                ## div(style="font-size: 16px", align="center", "CellMinerCDB enables exploration and analysis of cancer cell line pharmacogenomic data across different sources. If publishing results based on this site, please cite: ", a("Rajapakse.VN, Luna.A, Yamade.M et al. iScience, Cell Press. 2018 Dec 12.", href="https://www.cell.com/iscience/fulltext/S2589-0042(18)30219-0", target = "_blank", style="font-size: 16px;", class = "dm")),
                style = "font-size: 20px;",
-               uiOutput('tabsetPanelpb')
+               ## uiOutput('tabsetPanelpb')
+               
+               tabsetPanel(id="tspb",
+                           tabPanel("Plot Data", value=1, uiOutput("showCellsUipb"), plotlyOutput("rChartsAlternativepb", width = plotWidth, height = plotHeight),
+                                    br(), br(), p("Plot point tooltips provide additional information.")), 
+                           tabPanel("View Data", value=2,
+                                    downloadLink("downloadDatapb", "Download selected x and y axis data as a Tab-Delimited File"),
+                                    DT::dataTableOutput("tablepb")), 
+                           tabPanel("Compare Patterns", value=3,
+                                    includeMarkdown("www/files/help.md"),
+                                    #br(),
+                                    HTML("<b>Pattern comparison results are computed with respect to that data defined and shared by both the x and y-axis inputs.</b>"),
+                                    br(),br(),
+                                    fluidRow(
+                                      #column(3, selectInput("patternComparisonType", "Pattern Comparison",
+                                      #           						choices=c("Molecular Data"="molData", "Drug Data"="drug"), 
+                                      #											selected="molData")),
+                                      
+                                      column(4, HTML(
+                                        paste("<label class='control-label' for='patternComparisonTypepb'>Select molecular or activity data</label>","<select id='patternComparisonTypepb'><option value='moldata' selected>Molecular Data</option><option value='drug'>Drug Data</option></select>")
+                                      )),
+                                      
+                                      column(8, radioButtons("crossdbpb", label = NULL, choices = list("Compare x-Axis input to x-Axis molecular or activity data" = "No", "Compare x-Axis input to y-Axis molecular or activity data" = "Yes"), selected  = "No", inline=F, width="100%")       
+                                      )
+                                      
+                                    ),
+                                    br(),
+                                    renderUI({
+                                      req(PatternCompTablepb())
+                                      downloadLink("downloadDataComppb", "Download All as a Tab-Delimited File")
+                                    }),
+                                    ##downloadLink("downloadDataComp", "Download All as a Tab-Delimited File"),
+                                    withSpinner(DT::dataTableOutput("patternComparisonpb")))
+                           
+               )
+               
              )
            )
          )
