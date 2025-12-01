@@ -1313,7 +1313,7 @@ patient_to_patient <- reactive ({
     # sample_vector_mutation <- mutation_a_filtered %>%
     #   select({{ selected_sample_value }})
     cat(nrow(mutation_a_filtered) ,"\t", nrow(sample_vector_mutation),"****mutation****\n" )
-    write.csv(mutation_a_filtered,"mut_a_filtered.csv")
+    ## write.csv(mutation_a_filtered,"mut_a_filtered.csv") ## test
     
     ## new mutation calculation 
     if (nrow(mutation_a_filtered) < 1) {
@@ -1627,7 +1627,7 @@ patient_to_patient <- reactive ({
     shinyjs::toggle("selected_sample_info", condition = TRUE)
     
     
-    write.csv(data,"test_balloon.csv")
+    ## write.csv(data,"test_balloon.csv") ## test
     return(data)
     }
   })

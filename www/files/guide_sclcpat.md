@@ -42,7 +42,7 @@ output: html_document
 <h2 id="introduction">Introduction</h2>
 SCLC TumorMinerCDB is an interactive web application that simplifies access and exploration of Small Cell Lung Cancer (SCLC) patient genomic and treatment response data across different data types (see About the data section for more details). Navigation in the application is done using main menu tabs (see figure below). It includes 10 tabs: 2 variable Analyses, Multivariable Analysis, Expression distribution, Mutation Variants, Prognosis biomarkers, Predictive biomarkers, MyPatient, Download data, Search IDs and Help. 2 variable Analyses is selected by default when entering the site. Each option includes a side bar menu (to choose input) and a user interface output to display results. Analysis (sub-menu) options are available on the top for the 2 variable Analysis, Multivariate Analysis, mutation variants prognosis and predictive biomarkers tabs (see sub-menu on figure). The sub-menu first option result is displayed by default (Figure 1).
 
-![Screenshot of CellMinerCDB Application](files/Slide1.jpeg)
+![Screenshot of CellMinerCDB Application](Slide1.jpeg)
 
 **Figure 1**: Main application interface
 
@@ -77,14 +77,14 @@ Some options are available to play with the plot image using icons on the top fr
 <tr> <td><img src="files/icon4.png" alt="icon"></td> <td> Allows the user to create horizontal and vertical line from either a sample dot or the regression line, by hovering over them.</td></tr>
 </table>
 
-![Screenshot of CellMinerCDB Application](files/Slide2.jpeg)
+![Screenshot of CellMinerCDB Application](Slide2.jpeg)
 
 **Figure 2**: An example scatterplot of ASCL1 gene expression (horizontal axis)  versus YAP1 gene expression (verical axis). The Pearson correlation value and p value appear at the top of the plot. A linear fitting curve is included. This is an interactive plot and whenever the user changes any input value, the plot will be updated. Any point in the plot can be hovered over to provide additional information about sample, tissue, Onco tree designation,  and x and y coordinate values.
 
 <h3 id="download">View Data</h3>
 This option both displays the data selected from the **Plot Data** tab in tabular form, and provides a **Download selected x and y axis data as Tab-Delimited File** option. The user can change the input data in the left selection panel as described for Plot Data. The displayed table include the sample, the x-axis value, the y-axis value, the tissue of origin, the 4 onco-tree levels and other available sample annotation such as Epithelial Mesenchymal Transition (EMT) status. Within the header the selected features are prefixed by the data type abbreviation and post-fixed by the data source.
 
-![Screenshot of CellMinerCDB Application](files/Slide3.jpeg)
+![Screenshot of CellMinerCDB Application](Slide3.jpeg)
 
 **Figure 3**: Shows the selected values for ASCL1 gene expression (horizontal axis) and YAP1 gene expression (vertical axis) across all samples. The features are coded as xsqASCL1_patient and xsqYAP1_patient where “xsq” represent gene expression based on rnaseq.
 
@@ -93,7 +93,7 @@ This option allows one to compute the correlation between the selected feature a
 
 Pearson’s correlations are provided, with reported p-values (adjusted for multiple comparisons) in tabular form. This displays features are organized by level of correlation, and includes target pathway for genes and mechanism of action (MOA) for drugs (if available). 
 
-![Screenshot of CellMinerCDB Application](files/Slide4.jpeg)
+![Screenshot of CellMinerCDB Application](Slide4.jpeg)
 
 **Figure 4**: Shows correlation results for ASCL1 gene with all other molecular features for all data types (gene expression, mutation and metadata) sorted by correlation value with gene location and target pathways (annotation field).
 
@@ -125,14 +125,14 @@ This option provides the observed response and predictor variables across all sa
 
 The user can restrict the number of samples to those that have the highest or lowest response values by selecting **Number of High/Low Response Lines to Display**. The user can download the heatmap related data by clicking on **Download Heatmap Data**.
 
-![Screenshot of CellMinerCDB Application](files/Slide5.jpeg)
+![Screenshot of CellMinerCDB Application](Slide5.jpeg)
 
 **Figure 5**: An example heatmap where we selected ASCL1 as a response variable and; INSM1, DLL3, CHGA, NEUROD1, POU2F3 and NOTCH1 gene expression as predictor variables. 
 
 If the Lasso algorithm is selected (see below) more predicted variables are added (ABCC10 and POU2F3 are added)
 
 
-![Screenshot of CellMinerCDB Application](files/Slide6.jpeg)
+![Screenshot of CellMinerCDB Application](Slide6.jpeg)
 
 **Figure 6**: Same example as previous figure with the Lasso algorithm using ABC transports gene set.
 
@@ -140,14 +140,14 @@ If the Lasso algorithm is selected (see below) more predicted variables are adde
 This option shows the detailed data for the model variables for each sample. Both the 10-fold cross validation (CV) as well as the predicted responses are given. The data is displayed as a table with filtering options for each column. 
 
 
-![Screenshot of CellMinerCDB Application](files/Slide7.jpeg)
+![Screenshot of CellMinerCDB Application](Slide7.jpeg)
 
 **Figure 7**: Data related to the simple linear regression model presented in the previous section.
 
 <h3 id="plotpred">Plot</h3>
 This option enables one to plot and compare the observed response values (y-axis) versus the predicted response values (x-axis). The predicted response values are derived from a linear regression model fit to the full data set.
 
-![Screenshot of CellMinerCDB Application](files/Slide8.jpeg)
+![Screenshot of CellMinerCDB Application](Slide8.jpeg)
 
 **Figure 8**: Plot comparing ASCL1 observed vs. predicted expression with high correlation value of 0.88
 
@@ -157,14 +157,14 @@ This option enables plotting the observed response values (y-axis) versus the 10
 Cross-validation is widely used in statistics to assess model generalization to independent data – with the caveat that the independent data must still share the same essential structure (i.e., probability distribution) as the training data. It can also indicate possible overfitting of the training data, such as when the observed versus full data set model-predicted correlation (shown in ‘Plot’) is substantially better than the observed versus cross-validation predicted correlation (shown in ‘Cross-Validation’).
 
 
-![Screenshot of CellMinerCDB Application](files/Slide9.jpeg)
+![Screenshot of CellMinerCDB Application](Slide9.jpeg)
 
 **Figure 9**: Plot comparing ASCL1 observed vs. cross-validation predicted activity with still high correlation value of 0.87
 
 <h3 id="details">Technical Details</h3>
 This option enables the user to view the R statistical and other technical details related to the predicted response model. To save, these results may be copied and pasted into the document or spreadsheet of your choice. 
 
-![Screenshot of CellMinerCDB Application](files/Slide10.jpeg)
+![Screenshot of CellMinerCDB Application](Slide10.jpeg)
 
 **Figure 10**: Example of regular regression model fitting results
 
@@ -178,7 +178,7 @@ In order to run a partial correlation analysis, the user should first construct 
   -	optionally, specify the **Minimum Range** for the first listed data type (step 7 in figure below)
   - And finally click on button **run** (step 8 in figure below).
   
-![Screenshot of CellMinerCDB Application](files/Slide11.jpeg)
+![Screenshot of CellMinerCDB Application](Slide11.jpeg)
 
 **Figure 11**: An example of  partial correlation results for selected gene expression data using all gene sets.
 
@@ -197,7 +197,7 @@ Mutilple data analysis workflows may be used dependent of the question being ask
 
 The expression distribution option enables to display for a selected gene its expression distribution within each dataset using interactive boxplots.
 
-![Screenshot of CellMinerCDB Application](files/Slide12.jpeg)
+![Screenshot of CellMinerCDB Application](Slide12.jpeg)
 
 **Figure 12**: An example of  Expression distribution for selected gene SLFN11.
 
@@ -205,11 +205,11 @@ The expression distribution option enables to display for a selected gene its ex
 
 The Mutation Variants option allow to query all variants for the selected genes across all samples. Each variant is well annotated with details such as such as variant allele frequency (VAF), mutation type (Exonic function) and Amino Acid changes (AAChange). The AAChange specfies the cDNA (c.) and the protein (p.) changes for all gene transcripts. All other details can be found by scrolling to the right of the screen. 
 
-![Screenshot of CellMinerCDB Application](files/Slide13.jpeg)
+![Screenshot of CellMinerCDB Application](Slide13.jpeg)
 
 **Figure 13**: An example of mutation variant Oncoplot for selected genes TP53, RB1, MUC17 AND FLG2.
 
-![Screenshot of CellMinerCDB Application](files/Slide14.jpeg)
+![Screenshot of CellMinerCDB Application](Slide14.jpeg)
 
 **Figure 14**: An example of  mutation variants details view for selected genes TP53, RB1, MUC17 AND FLG2.
 
@@ -258,27 +258,27 @@ In case of Lasso (for gene expression) the user will have:
 
 The following figures 15 to 18 show an example of multivariate survival analysis based on user-specified genes where figures 19 and 20 show an example using Lasso approach.
 
-![Screenshot of CellMinerCDB Application](files/Slide15.jpeg)
+![Screenshot of CellMinerCDB Application](Slide15.jpeg)
 
 **Figure 15**: An example of Kaplan Meir plot based on average gene expression of CCL5 and ABCC12 in Tongji SCLC patients
 
-![Screenshot of CellMinerCDB Application](files/Slide16.jpeg)
+![Screenshot of CellMinerCDB Application](Slide16.jpeg)
 
 **Figure 16**: Multivariate Cox analysis summary results from the previous example in figure 15
 
-![Screenshot of CellMinerCDB Application](files/Slide17.jpeg)
+![Screenshot of CellMinerCDB Application](Slide17.jpeg)
 
 **Figure 17**: Heatmap of overall survival and selected genes from the previous example in figure 15
 
-![Screenshot of CellMinerCDB Application](files/Slide18.jpeg)
+![Screenshot of CellMinerCDB Application](Slide18.jpeg)
 
 **Figure 18**: Multivariate Cox analysis detailed results from the previous example in figure 15
 
-![Screenshot of CellMinerCDB Application](files/Slide19.jpeg)
+![Screenshot of CellMinerCDB Application](Slide19.jpeg)
 
 **Figure 19**: An example of Lasso Cox analysis that predicts a set of 4 ABC transporter prognostic genes in Tongji SCLC patients: ABCC12, ABCB1, ABCG4 and ABCA9. Here we show the Kaplan Meier plot based on the average of the 4 genes.
 
-![Screenshot of CellMinerCDB Application](files/Slide20.jpeg)
+![Screenshot of CellMinerCDB Application](Slide20.jpeg)
 
 **Figure 20**: Lasso Cox analysis summary results from the previous example in figure 19
 
@@ -287,7 +287,7 @@ The following figures 15 to 18 show an example of multivariate survival analysis
 This option allows to compare predictive biomarkers expression to other Molecular and/or drug response patterns for possible association in our patient data.  This is similar to the 2 variable analysis option but the horizontal axis is dedication to the gene expression of our curated list of predictive biomarkers. 
 Input and output details can be viewed in the **2 variable analyses** section.
 
-![Screenshot of CellMinerCDB Application](files/Slide21.jpeg)
+![Screenshot of CellMinerCDB Application](Slide21.jpeg)
 
 **Figure 21**: Main predictive biomarkers interface
 
@@ -301,7 +301,7 @@ Users can search for patients based on various parameters such as patientID, gen
 
 <br>
 
-![Screenshot of PatientLookUp Page](files/Slide22.jpeg)
+![Screenshot of PatientLookUp Page](Slide22.jpeg)
 
 **Figure 22**: Patient Look Up Table of the MyPatient Module where Patient CL0106 is selected
 
@@ -311,7 +311,7 @@ The Clinical Data page displays both the demographic data and sample data of the
 
 <br>
 
-![Screenshot of Clinical Data Page](files/Slide23.jpeg)
+![Screenshot of Clinical Data Page](Slide23.jpeg)
 
 **Figure 23**: Clinical Data Table of the MyPatient Module, Patient ID: CL0106
 
@@ -320,18 +320,18 @@ After viewing the Clinical Data table, users can look at the patient Gene Expres
 
 <br>
 
-![Screenshot of Gene Expression Page](files/Slide24.jpeg)
+![Screenshot of Gene Expression Page](Slide24.jpeg)
 
 **Figure 24**: Gene Expression table of the MyPatient Module, Patient ID: CL0106
 
-![Screenshot of Gene Expression Page](files/Slide25.jpeg)
+![Screenshot of Gene Expression Page](Slide25.jpeg)
 
 **Figure 25**: Mutation table of the MyPatient Module, Patient ID: CL0106
 
 <h3>Specific genes</h3>
 The user can also use the “specific genes” TAB to view specific gene values across all data experiments: gene expression, mutation, methylation and copy  number. In Figure 26, we present the values for patient CL0106 the values of MKI67 and TOP2A genes across all samples and experiments.
 
-![Screenshot of Gene Expression Page](files/Slide26.jpeg)
+![Screenshot of Gene Expression Page](Slide26.jpeg)
 
 **Figure 26**: Specific genes table of the MyPatient Module, Patient ID: CL0106
 
@@ -339,7 +339,7 @@ The user can also use the “specific genes” TAB to view specific gene values 
 <h3>Immune therapy treatment</h3>
 We provide for each patient potential Antibody-Drug Conjugate (ADC) treatments. The drugs are selected based on target gene having high expression values (in log2FPKM) greater or equal to 6 in at least one sample. As you can see in figure 27, there are 4 drugs to explore for patient CL0106 care. 
 
-![Screenshot of Gene Expression Page](files/Slide27.jpeg)
+![Screenshot of Gene Expression Page](Slide27.jpeg)
 
 **Figure 27**: Immune therapy treatments for Patient ID: CL0106
 
@@ -364,23 +364,23 @@ The following figures 28 to 31 shows similarity results of patient sample CL0106
 <br> 
 Figure 28 visualizes the results with a balloon plot representing for sample CL0106_T1 the top twenty similar tumor samples based on the sum of all scores
 
-![Screenshot of Patient to Patient Balloon Plot](files/Slide28.jpeg)
+![Screenshot of Patient to Patient Balloon Plot](Slide28.jpeg)
 **Figure 28**: Patient to Patient Balloon Plot, Patient Sample ID: CL0106_T1
 
 Figure 29 shows the table of similarity scores between sample CL0106_T1 and all 212 SCLC patient samples, sortable and queryable by any column, facilitating the exploration of genomic correlations and shared characteristics.  
 
-![Screenshot of Patient to Patient Comparison Table](files/Slide29.jpeg)
+![Screenshot of Patient to Patient Comparison Table](Slide29.jpeg)
 **Figure 29**: Patient to Patient Comparison Table, Patient Sample ID: CL0106_T1
 
 <br> 
 Figure 30 visualizes the results with a balloon plot representing for sample CL0106_T1 the top twenty similar CCLE cell lines based on the sum of all scores
 
-![Screenshot of Patient to Patient Balloon Plot](files/Slide30.jpeg)
+![Screenshot of Patient to Patient Balloon Plot](Slide30.jpeg)
 **Figure 30**: Patient to Cell line Balloon Plot, Patient Sample ID: CL0106_T1
 
 Figure 31 shows the table of similarity scores between sample CL0106_T1 and all 1089 CCLE cell lines, sortable and queryable by any column, facilitating the exploration of genomic correlations and shared characteristics.  
 
-![Screenshot of Patient to Patient Comparison Table](files/Slide31.jpeg)
+![Screenshot of Patient to Patient Comparison Table](Slide31.jpeg)
 **Figure 31**: Patient to Cell Line Comparison Table, Patient Sample ID: CL0106_T1
 
 
@@ -388,7 +388,7 @@ Figure 31 shows the table of similarity scores between sample CL0106_T1 and all 
 <h2 id="metadata">Download data</h2>
 The user can download data via: **Select Data Type to Download** and then click on **Download Data type** and/or **Download Data Footnotes** to download any data or footnotes for the selected sample set. Finally the user has the option to **Download current patient set information** by clicking on **Download patients annotation**.
 
-![Screenshot of CellMinerCDB Application](files/Slide32.jpeg)
+![Screenshot of CellMinerCDB Application](Slide32.jpeg)
 
 **Figure 32**: Download patient data
 
@@ -401,14 +401,14 @@ This enables to search all related ID for each combination. For the molecular da
 <h3 id="drugid">Drug IDs</h3>
 The drug identifiers (ID) are the Drug names. It could be a single or a combination of drugs.
 
-![Screenshot of CellMinerCDB Application](files/Slide33.jpeg)
+![Screenshot of CellMinerCDB Application](Slide33.jpeg)
 
 **Figure 33**: Example of a search: if looking for a drug ID select "Drug response" as the data type. You can type in search box of column "Drug name" or "MOA".
 <br>
 <h3 id="geneid">Gene IDs</h3>
 For all data types, the gene ID is the Hugo gene symbol however the application also recognizes any synonym or previous symbol (alias) that is included in the Hugo database.
 
-![Screenshot of CellMinerCDB Application](files/Slide34.jpeg)
+![Screenshot of CellMinerCDB Application](Slide34.jpeg)
 
 **Figure 34**: Example of a search: if looking for a gene ID, select "gene expression" as the data type. You can type in search box of column "gene name" or "entrez gene id" or "Chromosome"...
 
@@ -436,12 +436,12 @@ The current drug data is limited to few samples mainly from NCI. We selected for
 Gene sets used for annotation of analysis results or algorithm input filtering were curated by the
 NCI/DTB CellMiner team, based on surveys of the applicable research literature.
 
-![Screenshot of CellMinerCDB Application](files/Slide35.jpeg)
+![Screenshot of CellMinerCDB Application](Slide35.jpeg)
 **Figure 35**: Summary of current genomic patient samples.   
 
 The following table  enumerates the available data types that could be queried within the app providing the data type abbreviation or prefix, description, feature value unit (z-score, intensity, probability …), platform or experiment. 
 
-![Screenshot of CellMinerCDB Application](files/Slide36.jpeg)
+![Screenshot of CellMinerCDB Application](Slide36.jpeg)
 **Figure 36**: Data type metadata.   
 
 

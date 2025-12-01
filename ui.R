@@ -4,6 +4,7 @@ library(shinycssloaders)
 library(plotly)
 library(shinyTree)
 library(shinyjs)
+library(markdown)
 
 # options(repos = BiocInstaller::biocinstallRepos()) ## bioconductor 3.7
 # getOption("repos")
@@ -370,7 +371,7 @@ tabPanel("Mutation variants",
                  ),
                  br(),br(),br(),
                  textInput("geneId", "Gene Identifiers: (max 5, separated by a space e.g. TP53 RB1 MUC17 FLG2)", "TP53 RB1 MUC17 FLG2"),
-                
+                 br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br() ## new
                )
              ), #end sidebarPanel
              mainPanel(
@@ -685,49 +686,12 @@ tabPanel("Download data",
 		             )
 		           )
 		         ) #end fluidPage
-		), #end tabPane
-		#-----[NavBar Tab: About]------------------------------------------------------------------------
-# 		tabPanel("TCGA distribution",
-# 		            fluidPage(	
-# 		              sidebarLayout(
-# 		                sidebarPanel(
-# 		                  width=3, 
-# 		                  tags$div(
-# 		                    id="input_container", 
-# 		                    tags$a(id="skiplink"),
-# 		                    #selectInput("mdataSource", "Data Source", choices=metaChoices, selected = "nci60")
-# 		                    HTML(
-# 		                      paste("<label class='control-label' for='mdataSource'>patient Set</label>","<select id='cmpSource'>",metaoptions,"</select>")
-# 		                    ),
-# 		                    br(),br(),
-# 		                    textInput("vgene", "Gene symbol: ", "SLFN11"),
-# 		                    #uiOutput("cmpTypeUi"),
-# 		                    br(),br(),
-# 		                    checkboxInput("zsid","z-score ",value=T),
-# 		                    br(),br(),
-# 		                    br(),br(),
-# 		                    HTML("<b>Compare current patient set expression to TCGA</b>"),
-# 		                    br(),
-# 		                    actionButton('subtcga', 'Submit'),
-# 		                    br(),br(),br(),br(),
-# 		                    br(),br(),br(),br()
-# 		                  )
-# 		                ), #end sidebarPanel
-# 		                mainPanel(
-# 		                  #htmlOutput('sourceLink'),
-# 		                  #uiOutput('sourceLink'),
-# 		                  ## includeMarkdown("www/files/tcga.md"),
-# 		                  withSpinner(plotlyOutput('tcgaPlot'))
-# 		                  
-# 		                )
-# 		              )
-# 		            ) #end fluidPage
-#            ), 
+		), #end tabPanel
+
 		tabPanel("Help",
 		         tags$a(id="skiplink"),
 		         includeMarkdown("www/files/guide_sclcpat.md")
-		         ## includeMarkdown("www/files/guide_pat.md")
-		         ## includeHTML("www/files/guide2.html")
+		          
 		         #h1("For testing"),
 		         #textOutput("ipAddress")
 		)

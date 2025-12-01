@@ -54,14 +54,12 @@ ll = unlist(lapply(mygeneset, function(x) length(mygeneset[x])))
 list.genesets = paste0(list.genesets," (",ll,")")
 names(mygeneset) = list.genesets
   
-#list.genesets = names(geneSetPathwayAnalysis::geneSets)
-acc_list = read.delim("acc_genes_4997.txt",stringsAsFactors = F)[,1]
-# mygeneset = geneSetPathwayAnalysis::geneSets
  
+acc_list = read.delim("acc_genes_4997.txt",stringsAsFactors = F)[,1]
 accgeneset = list("ACC variable genes (4997)" = acc_list)
 mygeneset = append(accgeneset, mygeneset)
 
-source("modal1.R")
+## source("modal1.R")
 source("appUtils.R")
 source("dataLoadingFunctions.R")
 
@@ -159,8 +157,8 @@ removeMolDataType <- memoise(rcellminer::removeMolDataType, cache = db)
 # print(sessionInfo())
 # sink()
 
-library(bigrquery)
-library(httpuv)
+# library(bigrquery)
+# library(httpuv)
 aproject <-"isb-cgc-fathi"
 
 ## enableBookmarking("url") ### bookmarking >> global.R
@@ -525,7 +523,7 @@ shinyServer(function(input, output, session) {
       ## dat$variable = rscore
       dat$months_to_last_known_alive = months_to_last_known_alive
       dat$vital_status = vital_status
-      write.csv(dat, "dat_test_v3_LASSO.csv")
+     ## write.csv(dat, "dat_test_v3_LASSO.csv")
       ## cat(dim(dat), "  ..dat\n")
       ## cat(dim(res), "  ..cox multi\n")
       cesp0 = coxph(Surv(months_to_last_known_alive, vital_status)~variable,data=dat)
@@ -3544,13 +3542,13 @@ shinyServer(function(input, output, session) {
   par(mar = c(1, 1, 10, 1))  # Adjust margins
   oncoplot(maf = maf, clinicalFeatures = 'dataSource', top=5, sortByAnnotation = T, barcode_mar = 10,
            fontSize = 1.2, legendFontSize = 2.5, annotationFontSize = 2.5, gene_mar = 7, showTitle = F ,
-           titleFontSize = 2, drawColBar = F , titleText = paste0("Altered in ",nrow(clindata)," of total ",mut_input()$totpat, " samples")
+           titleFontSize = 2, drawColBar = F , drawRowBar = T , titleText = paste0("Altered in ",nrow(clindata)," of total ",mut_input()$totpat, " samples")
   )
   
 
   
     
-  } ,  width=1200, height=650 # was 650
+  } ,  width=1200, height=650 # was 1200 and 650
   )  
   
   output$MutationPlotly <- renderPlotly({

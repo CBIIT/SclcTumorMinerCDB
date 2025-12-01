@@ -10,13 +10,7 @@ OutOfSurvival <- c("CSCLC_NCI","LNET_MyPart","NSCLC_NCI","SCCE_NCI","TNET_NCI","
  ccleinfo <- read.csv("ccle_cells_depmap_infosimilar_drugs.csv", row.names = 1, stringsAsFactors = F)
 
 ## ADC target genes
-## adcgenes = read.delim("Genes44_targetADC_v2.txt",row.names = 1)
 
-# adcgenes0 = read.delim("Genes52_targetADC_drug_status.txt")
-# adcgenes0 = adcgenes[, c(1,3,5,2,4,6)]
-
-## adcgenes = read.delim("Genes53_targetADC_drug_041224.txt")
-## adcgenes = read.delim("Genes60_targetADC_drug_112524.txt")
 ## adcgenes = read.delim("Genes72_targetADC_drug_06022025.txt")
 adcgenes = read.delim("Genes63_targetADC_drug_06102025.txt")
 

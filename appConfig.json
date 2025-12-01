@@ -5,10 +5,10 @@
   "appRelease":"June 2025",
   "runParCorsInParallel":true,
   "runParCorsInParallelThreshold":2000,
-//  "cacheDir" : "~/patientCache/.rcache",
- //  "downloadDir": "~/patientMiner-downloads",
-  "cacheDir" : "/mnt/Posit-Share/Posit-Users/Tumors/SCLC/rcache",
-  "downloadDir": "/mnt/Posit-Share/Posit-Users/Tumors/SCLC/downloads",
+  "cacheDir" : "~/patientCache/.rcache",
+  "downloadDir": "~/patientMiner-downloads",
+ // "cacheDir" : "/mnt/Posit-Share/Posit-Users/Tumors/SCLC/rcache",
+ // "downloadDir": "/mnt/Posit-Share/Posit-Users/Tumors/SCLC/downloads",
    "TopLinks":[
           {
             "label":" CellMiner NCI-60 ",
