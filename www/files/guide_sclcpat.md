@@ -59,14 +59,14 @@ Molecular and/or drug response patterns can be compared to look for possible ass
 <br><br>
 2.	The vertical axis data choices are as explained above for the horizontal axis.
 <br><br>
-3.  Selected tissues: by default, all tissues are selected and included in the scatter plot. To include or exclude patient samples from specific tissues, the user should specify:
-  - **Select Tissues** to include or exclude specific tissues
-  - **Select Tissues of Origin Subset/s** functionality at the bottom of the left-hand panel. The tissues of Origin are organized as a tree and are all selected by default. In order to select a specific tissue, the user should click on the root of the tree represented by the triangle icon to expand the tree recursively until reaching a specific sub tree or leaf. The selection is finalized by clicking on the leaf label. On Macs, more than one tissue of origin may be selected using the "command" button. On PC's use the "control" key. All patient samples were mapped to the two first of the four-level OncoTree cancer tissue type hierarchy developed at <a href="http://www.cbioportal.org/oncotree/" target="_blank" class="dm">Memorial Sloan-Kettering Cancer Center</a>. 
-  - **Tissues to Color** to locate samples related to desired tissues within the scatter plot. By default, the samples are colored by their OncoTree cancer tissue level 1 pre-assigned color. Selecting a tissue makes related samples appear in red while remaining samples are colored in grey. The **Show Color** checkbox should be active.
+3.  Selected subsets: by default, all tissues are selected and included in the scatter plot. To include or exclude patient samples from specific tissues or subsets, the user should specify:
+  - **Select Subsets** to include or exclude specific tissues or other subsets
+  - **Select Subset(s)** functionality at the bottom of the left-hand panel. The subsets are organized as a tree and are all selected by default. In order to select a specific subset/tissue, the user should click on the root of the tree represented by the triangle icon to expand the tree recursively until reaching a specific sub tree or leaf. The selection is finalized by clicking on the leaf label. On Macs, more than one tissue of origin may be selected using the "command" button. On PC's use the "control" key. All patient samples were mapped to the two first of the four-level OncoTree cancer tissue type hierarchy developed at <a href="http://www.cbioportal.org/oncotree/" target="_blank" class="dm">Memorial Sloan-Kettering Cancer Center</a>. 
+  - **Select Subset(s) to Color** to locate samples related to desired tissues or subsets within the scatter plot. By default, the samples are colored by their dataset assigned color. Selecting a specific subset makes related samples appear in red while remaining samples are colored in grey. The **Show Color** checkbox should be active.
 <br><br>
 
 <h3 id="plot">Plot Data</h3>
-Any pair of features across patient samples can be plotted (as a scatterplot) including the resultant Pearson correlation and p-value. The p-value estimates assume multivariate normal data, and are less reliable as the data deviate from this. Please use the scatter plot to check the data distribution (e.g., for outlying points outside of a more elliptically concentrated set). The user also has the option to select  a set of samples to highlight using a list box of sample Ids on the top of the scatter plot.
+Any pair of features across patient samples can be plotted (as a scatterplot) including the resultant Pearson correlation and p-value. Since the website includes datasets from multiple institutions, we provide a correlation value for each dataset. The p-value estimates assume multivariate normal data, and are less reliable as the data deviate from this. Please use the scatter plot to check the data distribution (e.g., for outlying points outside of a more elliptically concentrated set). The user also has the option to select  a set of samples to highlight using a list box of sample Ids on the top of the scatter plot.
 <br><br>
 Some options are available to play with the plot image using icons on the top from left to right:
 <br>
@@ -127,14 +127,14 @@ The user can restrict the number of samples to those that have the highest or lo
 
 ![Screenshot of CellMinerCDB Application](Slide5.jpeg)
 
-**Figure 5**: An example heatmap where we selected ASCL1 as a response variable and; INSM1, DLL3, CHGA, NEUROD1, POU2F3 and NOTCH1 gene expression as predictor variables. 
+**Figure 5**: An example heatmap where we selected ASCL1 as a response variable and; INSM1, CHGA, MKI67, NEUROD1, POU2F3, YAP1 and MYC gene expression as predictor variables. 
 
-If the Lasso algorithm is selected (see below) more predicted variables are added (ABCC10 and POU2F3 are added)
+If the Lasso algorithm is selected (see below) more predicted variables are added.
 
 
 ![Screenshot of CellMinerCDB Application](Slide6.jpeg)
 
-**Figure 6**: Same example as previous figure with the Lasso algorithm using ABC transports gene set.
+**Figure 6**: Same example as previous figure with the Lasso algorithm using ABC transports gene set. Lasso generates automatically a list of predictors: ABCC13, ABCC12, ABCB9, and ABCA1.
 
 <h3 id="data">Data</h3>
 This option shows the detailed data for the model variables for each sample. Both the 10-fold cross validation (CV) as well as the predicted responses are given. The data is displayed as a table with filtering options for each column. 
@@ -149,7 +149,7 @@ This option enables one to plot and compare the observed response values (y-axis
 
 ![Screenshot of CellMinerCDB Application](Slide8.jpeg)
 
-**Figure 8**: Plot comparing ASCL1 observed vs. predicted expression with high correlation value of 0.88
+**Figure 8**: Plot comparing ASCL1 observed vs. predicted expression with high correlation value for the 3 datasets.
 
 <h3 id="cross">Cross-Validation</h3>
 This option enables plotting the observed response values (y-axis) versus the 10-fold cross-validation predicted response values (x-axis). With this approach, the predicted response values are obtained (over 10 iterations) by successively holding out 10% of the samples and predicting their response using a linear regression model fit to the remaining 90% of the data. After all 10 folds have been done, each sample has one cross-validated prediction (since each sample gets in the test set once). We compute the correlation between these cross-validated predictions and the true responses.
@@ -159,7 +159,7 @@ Cross-validation is widely used in statistics to assess model generalization to 
 
 ![Screenshot of CellMinerCDB Application](Slide9.jpeg)
 
-**Figure 9**: Plot comparing ASCL1 observed vs. cross-validation predicted activity with still high correlation value of 0.87
+**Figure 9**: Plot comparing ASCL1 observed vs. cross-validation predicted activity with still high correlation value for the 3 datasets
 
 <h3 id="details">Technical Details</h3>
 This option enables the user to view the R statistical and other technical details related to the predicted response model. To save, these results may be copied and pasted into the document or spreadsheet of your choice. 
@@ -367,7 +367,7 @@ Figure 28 visualizes the results with a balloon plot representing for sample CL0
 ![Screenshot of Patient to Patient Balloon Plot](Slide28.jpeg)
 **Figure 28**: Patient to Patient Balloon Plot, Patient Sample ID: CL0106_T1
 
-Figure 29 shows the table of similarity scores between sample CL0106_T1 and all 212 SCLC patient samples, sortable and queryable by any column, facilitating the exploration of genomic correlations and shared characteristics.  
+Figure 29 shows the table of similarity scores between sample CL0106_T1 and all 204 SCLC patient samples, sortable and queryable by any column, facilitating the exploration of genomic correlations and shared characteristics.  
 
 ![Screenshot of Patient to Patient Comparison Table](Slide29.jpeg)
 **Figure 29**: Patient to Patient Comparison Table, Patient Sample ID: CL0106_T1
@@ -427,7 +427,7 @@ It is a checkbox that enable and disable colors in the scatter plots
 
 Our genomics patient data currently includes RNA-seq and whole exome seq samples from the National Cancer Institute (NCI) and external collaborators focusing on small cell lung cancer (SCLC). Please see figure 35 for details. Clinical data, survival information and patient drug response data were curated by NCI clinicians.
 
-To reduce the batch effect, all RNASeq and ExomeSeq samples are processed the same way using the NCI Center for cancer research Collaborative Bioinformatics Resource (CCBR) [3,4] pipelines on hg38 human reference. A batch effect removal approach was applied on RNAseq samples to remove the effect of the library preparation (Access, PolyA or TotalRNA). Gene level mutation were computed using specific scripts described in cellminercdb paper [1].
+To reduce the batch effect, all RNASeq and ExomeSeq samples are processed the same way using the NCI Center for cancer research Collaborative Bioinformatics Resource (CCBR) [3,4] pipelines on hg38 human reference. Gene level mutation were computed using specific scripts described in cellminercdb paper [1,2].
 
 Genomics signatures scores such as Antigen Presentation Machinery (APM), Neuro-Endocrine (NE), Replication Stress or Tumor Mutation Burden (TMB) were computed and can be query with molecular features. Please see the list of these signatures and other miscellaneous features on the Search TAB.
 
@@ -454,14 +454,14 @@ Gene values were generated based on RSEM log2(FPKM+1).
 Using paired tumor and normal samples, we generate somatic variants based on our pipeline. We treat the fraction of alternate alleles (the mutation ratio) as a probability that any particular cell has that mutation. Furthermore we assume that the probability that any particular mutation is present in a gene is independent of the probability of any other mutation on that gene. Given those assumptions, we can calculate the overall mutation probability for that gene in any particular cell as 1-(1-p1)*(1-p2)*...*(1-pn), where p1, p2, ..., pn are the mutation ratios for each individual mutation on that gene, 1-pj is the probability that jth mutation is not present for a particular cell. Thus the product is the probability that none of the mutations are present and 1 minus the product is the probability that at least one mutation is present. The expression gives a number that is between 0 and 1, which we multiply by 100 to get the mutation score for that gene.
 
 **Methylation**
-Each probe on the array measures the methylation status of one CpG site, i.e. it computes the ratio of the intensity of the methylated probe to the methylated plus unmethylated probe intensities (a value between 0-unmethylated to 1-methylated). For each gene we select a set of probes that are close to the translational start site (TSS) of the gene as well as preferentially on a CpG Island. Please see (5) for details on the probe selection. We compute the average methylation value for all the selected probes which is presented as the methylation value for that gene.
+Each probe on the array measures the methylation status of one CpG site, i.e. it computes the ratio of the intensity of the methylated probe to the methylated plus unmethylated probe intensities (a value between 0-unmethylated to 1-methylated). For each gene we select a set of probes that are close to the translational start site (TSS) of the gene as well as preferentially on a CpG Island. Please see [5] for details on the probe selection. We compute the average methylation value for all the selected probes which is presented as the methylation value for that gene.
 
 **Copy number**
-The copy number are derived from the methylation data. We use the Bioconductor ChAMP package (6) to compute the log copy number at each CpG site. The average for all the CpG sites mapped to a gene is used as the average log copy number of that gene. A value of 0 implies 2N, while -1 implies 1N and 1 implies 4N. Specifically note that we do not do any kind of segmentation since the probe density is not high enough outside of the gene regions.
+The copy number are derived from the methylation data. We use the Bioconductor ChAMP package [6] to compute the log copy number at each CpG site. The average for all the CpG sites mapped to a gene is used as the average log copy number of that gene. A value of 0 implies 2N, while -1 implies 1N and 1 implies 4N. Specifically note that we do not do any kind of segmentation since the probe density is not high enough outside of the gene regions.
 
 <h2 id="release">Release history</h2>
 
-February 2025: release v1.0
+April 2026: release v1.0
 - Official lunch of website
 - Integrated RNASeq and WES for internal and external patient data 
 - Enabled survival analysis
@@ -471,21 +471,23 @@ February 2025: release v1.0
 <h2 id="about-tumorminer">About TumorMiner</h2>
 
 TumorMiner application has similar design to CellMinerCDB [1] a tool dedicated to mining cell line pharmaco-genomics data across databases. It is developed and maintained using R and Shiny by:
-* Fathi Elloumi; Bioinformatics Software Engineer, Developmental Therapeutics Branch, National Cancer Institute
+* Fathi Elloumi; Bioinformatics Staff Scientist, Developmental Therapeutics Branch, National Cancer Institute
 
 <h3 id="nci-dtb-genomics-and-bioinformatics-group">NCI-DTB Genomics and Bioinformatics Group</h3>
 
 * William C. Reinhold
 * Sudhir Varma
+* Jeffrey Wang
 * Fathi Elloumi
 * Yves Pommier
+* Augustin Luna
 
 
 <h2 id="references">References</h2>
 
-1 Luna A, Elloumi F, Varma S, et al. <a href="https://pubmed.ncbi.nlm.nih.gov/33196823/" target="_blank">CellMiner Cross-Database (CellMinerCDB) version 1.2: Exploration of patient-derived cancer cell line pharmacogenomics.</a>  Nucleic Acids Res. 2021;49(D1):D1083-D1093. doi:10.1093/nar/gkaa968
+1 Elloumi F, Reinhold CR, et al. <a href="https://pubmed.ncbi.nlm.nih.gov/41312628/" target="_blank">CellMiner cross-database (CellMinerCDB) version 2.2 for explorations of patient-derived cancer cell line pharmacogenomics.</a>  Nucleic Acids Res. 2026; Jan 6;54(D1):D1345-D1354. doi: 10.1093/nar/gkaf1230
 
-2 TCGA portal: https://portal.gdc.cancer.gov 
+2 Luna A, Elloumi F, Varma S, et al. <a href="https://pubmed.ncbi.nlm.nih.gov/33196823/" target="_blank">CellMiner Cross-Database (CellMinerCDB) version 1.2: Exploration of patient-derived cancer cell line pharmacogenomics.</a>  Nucleic Acids Res. 2021;49(D1):D1083-D1093. doi:10.1093/nar/gkaa968
 
 3 CCBR RNAseq pipeline: https://ccbr.github.io/RNA-seek/
 

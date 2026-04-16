@@ -3,8 +3,8 @@
   "patient":{
     "displayName":"Patient data",
     "packages":{
-     "patientsData":{
-     // "patientsNberData":{
+     // "patientsData":{
+     "patientsNberData":{
         "MolData":[
           {
             "eSetListName":"xsq",

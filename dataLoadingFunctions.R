@@ -477,7 +477,8 @@ loadSourceContentFiltered <- function(srcConfig,onco1=NA,onco2=NA){
       if (!is.na(onco1) & !is.na(onco2)) {
         
         if (onco2=="Small Cell Lung Cancer (SCLC)")
-        selindex = which(toupper(sampleData$OncoTree1)==toupper(onco1) & toupper(sampleData$OncoTree2)==toupper(onco2) & sampleData$sclc.sel==1)
+        ## selindex = which(toupper(sampleData$OncoTree1)==toupper(onco1) & toupper(sampleData$OncoTree2)==toupper(onco2) & sampleData$sclc.sel==1)
+          selindex = which(toupper(sampleData$OncoTree1)==toupper(onco1) & toupper(sampleData$OncoTree2)==toupper(onco2) & sampleData$sclc.sel==1 & sampleData$dataSet!="DataSet:UR")
         else
         selindex = which(toupper(sampleData$OncoTree1)==toupper(onco1) & toupper(sampleData$OncoTree2)==toupper(onco2))
       }

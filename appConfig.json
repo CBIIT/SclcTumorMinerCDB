@@ -1,8 +1,8 @@
 {
   "appName":"SCLC TumorMinerCDB",
-  // "appName":"SCLC TumorMiner",
+  // "appName":"SCLC TumorMinerCDB no correction",
   "appVersion":"1.0",  
-  "appRelease":"June 2025",
+  "appRelease":"April 2026",
   "runParCorsInParallel":true,
   "runParCorsInParallelThreshold":2000,
  // "cacheDir" : "~/patientCache/.rcache",

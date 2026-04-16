@@ -1,7 +1,7 @@
 library(rcellminer)
 
-## library(patientsData)
-##  library(patientsNberData)
+library(patientsData)
+library(patientsNberData)
 ## library(patientsBcorData)
 
 config <- jsonlite::fromJSON("config.json")

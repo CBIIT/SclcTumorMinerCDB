@@ -77,6 +77,7 @@ myPatientModuleUI <- function(id) {
                   style = "font-size: 21px; color: #333333; border: 2px solid black;",
                   DT::dataTableOutput(ns("patient_sample_data"))
                   ), 
+                  h6("(++) For weak cluster assignment we postfix the NMF cluster with *"),
                   h4("Please select a row on the Sample Data table and select the Find Similar Patient or Cell line Button to find similar samples"), 
                 ),
                 column(
@@ -436,8 +437,8 @@ myModule <- function(input, output, session, srcContent) {
   
   PatientSampleData <- data.frame(srcContent$patient$sampleData) %>%
     select(Name, patientID, TissueType, OncoTree1, OncoTree2, OncoTree3, OncoTree4, EMT, priorTreatment,
-           sampleType, sampleDate, dataSource, biopsySite, tumorStage, MSI.TSO500, molecularSubtype, disease) %>%
-    rename(Sample_Name = Name, Stage = tumorStage) ## 0313
+           sampleType, sampleDate, dataSource, biopsySite, tumorStage, MSI.TSO500, molecularSubtype, disease,sampleTissue) %>%
+    rename(Sample_Name = Name, Stage = tumorStage, Preservation = sampleTissue) ## 0313 >> 040826
   
   # Create a new column for genomic information in PatientSampleData
   xsq_information = apply(srcContent$patient$molPharmData$xsq, 2, function(x) { any(!is.na(x))}) 
@@ -516,43 +517,82 @@ myModule <- function(input, output, session, srcContent) {
   
   ## new April 2025 -------------------------------------------------------------
   ## NMF ****
-    nmf_data <- srcContent$patient$molPharmData$nmf
-  th = 3.8
-  nmf_results <- apply(nmf_data,2, function(x) {
-    # cat(x," ", is.numeric(x))
-    res = ""
-    # cat(x[1])
-    if (x[1] >= th ) {
-      res = "NMF1u,"
-    } 
-    if (x[2] >= th) {
-      res = paste(res,"NMF2u,",sep="")
-    }
-    if (x[3] >= th) {
-      res = paste(res,"NMF3u,",sep="")
-    }
-    if (x[4] >= th) {
-      res = paste(res,"NMF4u,",sep="")
-    }
-    if (x[5] >= th) {
-      res = paste(res,"NMF1r,",sep="")
-    }
-    if (x[6] >= th) {
-      res = paste(res,"NMF2r,",sep="")
-    }
-    if (x[7] >= th) {
-      res = paste(res,"NMF3r,",sep="")
-    }
-    if (x[8] >= th) {
-      res = paste(res,"NMF4r",sep="")
-    }
-   
-    if(res=="") res = "NoCall"
-    return(res)
-  }
-  )
+  nmf_data <- srcContent$patient$molPharmData$nmf[, PatientSampleData$Sample_Name]
+  th = 4
+  difold = 1
+  stopifnot(identical(colnames(nmf_data),PatientSampleData$Sample_Name))
+  lab_relapse = c("NMF1r", "NMF2r","NMF3r","NMF4r")
+  lab_untreated = c("NMF1u", "NMF2u","NMF3ru","NMF4u")
+  nmf_results = replicate(ncol(nmf_data),"NoCall")
+  names(nmf_results) = colnames(nmf_data)
   
-  nmf_results = gsub(",$","", nmf_results)
+  for (vv in 1:ncol(nmf_data)) {
+    if (PatientSampleData$dataSource[vv]=="SCLC_NCI")
+    { 
+      tt = nmf_data[5:8,vv] ## relapse
+      if (max(tt)>=th)
+      { 
+        nmfclus = lab_relapse[which.max(tt)]
+        tt = sort(tt, decreasing = T)
+        if ((tt[1]-tt[2]) >=difold) nmf_results[vv] = nmfclus else nmf_results[vv] = paste(nmfclus,"*")
+        
+      }
+      
+    } else
+    {
+      tt = nmf_data[1:4,vv] ## untreated
+      if (max(tt)>=th)
+      { 
+        nmfclus = lab_untreated[which.max(tt)]
+        tt = sort(tt, decreasing = T)
+        if ((tt[1]-tt[2]) >=difold) nmf_results[vv] = nmfclus else nmf_results[vv] = paste(nmfclus,"*")
+      
+    }
+    
+    }
+  }
+  
+  nmf_results = nmf_results[colnames(srcContent$patient$molPharmData$xsq)]
+  
+  # write.csv(rbind(nmf_data,nmf_results),"~/Documents/SS-NIH/check_nmf_class.csv")
+  
+  #   nmf_data <- srcContent$patient$molPharmData$nmf
+  # th = 3.8
+  # nmf_results <- apply(nmf_data,2, function(x) {
+  #   # cat(x," ", is.numeric(x))
+  #   res = ""
+  #   # cat(x[1])
+  #   if (x[1] >= th ) {
+  #     res = "NMF1u,"
+  #   } 
+  #   if (x[2] >= th) {
+  #     res = paste(res,"NMF2u,",sep="")
+  #   }
+  #   if (x[3] >= th) {
+  #     res = paste(res,"NMF3u,",sep="")
+  #   }
+  #   if (x[4] >= th) {
+  #     res = paste(res,"NMF4u,",sep="")
+  #   }
+  #   if (x[5] >= th) {
+  #     res = paste(res,"NMF1r,",sep="")
+  #   }
+  #   if (x[6] >= th) {
+  #     res = paste(res,"NMF2r,",sep="")
+  #   }
+  #   if (x[7] >= th) {
+  #     res = paste(res,"NMF3r,",sep="")
+  #   }
+  #   if (x[8] >= th) {
+  #     res = paste(res,"NMF4r",sep="")
+  #   }
+  #  
+  #   if(res=="") res = "NoCall"
+  #   return(res)
+  # }
+  # )
+  # 
+  # nmf_results = gsub(",$","", nmf_results)
   
  ## PatientSampleData$NMF_clusters <- nmf_results
  
@@ -606,7 +646,7 @@ adc_results = gsub(",$","", adc_results)
 
 groupsnew = data.frame(NMF_clusters  =  nmf_results, NAPY_classes = napy_results,
                        Predictive_biomarkers = adc_results) 
-colnames(groupsnew) = c("NMF_clusters (exp>=3.8)", "NAPY_clusters (exp>=5)", "Predictive_biomarkers (exp>=6)")
+colnames(groupsnew) = c("NMF_clusters (exp>=4) ++", "NAPY_clusters (exp>=5)", "Predictive_biomarkers (exp>=6)")
 # PatientSampleData$Predictive_biomarkers <- adc_results
 PatientSampleData <- merge(PatientSampleData, groupsnew,by.x=1, by.y=0)
 
@@ -891,7 +931,8 @@ PatientSampleData$molecularSubtype <- NULL
               # targets = c(1, 2, 3,5, 6, 7, 8, 14, 16, 22, 23, 24, 25, 26),  # index first column is ZERO !!!
               ## targets = c(1, 2, 3, 4, 5, 6, 7, 8, 14, 16),
               ## targets = c(1, 2, 3, 4, 5, 6, 7, 8, 12:18),
-              targets = c(1:6,8:9,11,13:18),
+              # targets = c(1:6,8:9,11,13:18),
+              targets = c(1:9,11,13:14,16:19),
               visible = FALSE
             )
           )

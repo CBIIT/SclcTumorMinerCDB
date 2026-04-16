@@ -2477,9 +2477,9 @@ shinyServer(function(input, output, session) {
     
     prefixChoices <- srcContent[[input$mdataSource]][["featurePrefixes"]]
     ## prefixChoices <- srcContent[["patient"]][["featurePrefixes"]] ## Dec 20, 2024
-    ii = which(prefixChoices=="xsq")
-    names(prefixChoices)[ii] = paste(names(prefixChoices)[ii], "with batch correction")
-    ##
+    # ii = which(prefixChoices=="xsq")
+    # names(prefixChoices)[ii] = paste(names(prefixChoices)[ii], "with batch correction") ## 040826
+    ## 
     selectedPrefix <- globalReactiveValues$xPrefix
     if ((is.null(selectedPrefix)) || (!(selectedPrefix %in% prefixChoices))){
       selectedPrefix <- srcContent[[input$mdataSource]][["defaultFeatureX"]]
