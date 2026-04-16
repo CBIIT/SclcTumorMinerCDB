@@ -49,7 +49,7 @@ shiny::runApp()
 
 
 ## Zenodo data
-The following pre-built data content (rds files) are available on Zenodo (https://zenodo.org/records/17793701) for use to run a local SclcTumorMinerCDB version. 
+The following pre-built data content (rds files) are available on Zenodo (https://zenodo.org/records/18343141) for use to run a local SclcTumorMinerCDB version. 
 
 * srcContent.rds: SCLC patient data
 * srcContent_cell.rds: SCLC cell line data from the Broad Institute (Cancer Cell Line Encycopedia) 
